@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-void InputManager::HandleEvent(SDL_Event *e) {
+void InputManager::handle_event(SDL_Event *e) {
         if (e->type == SDL_EVENT_KEY_DOWN) {
                 if (e->key.key < 127) {
                         key_down[e->key.key] = true;

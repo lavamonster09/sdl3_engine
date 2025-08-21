@@ -15,7 +15,7 @@ public:
     glm::vec2 mouse_pos = glm::vec2{0.0f, 0.0f};
     glm::vec2 last_mouse_pos = glm::vec2{0.0f, 0.0f};
 
-    void HandleEvent(SDL_Event *e);
+    void handle_event(SDL_Event *e);
 };
 
 

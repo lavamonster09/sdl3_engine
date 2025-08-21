@@ -4,30 +4,19 @@
 
 #ifndef COMMON_H
 #define COMMON_H
+#include <array>
+#include <vector>
+#include <SDL3/SDL.h>
 
-struct Vec3 {
-    float x, y, z;
+#include "engine_types.h"
 
-    Vec3(float X, float Y, float Z);
+SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage);
 
-    Vec3 operator+(Vec3 const &obj) const;
+SDL_GPUTransferBuffer *create_transfer_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUTransferBufferUsage usage);
 
-    Vec3 operator+(float a) const;
+MeshBuffer create_mesh_buffer(SDL_GPUDevice *device, std::vector<Vertex> &vertices,
+                              std::vector<Uint16> &indexes);
 
-    Vec3 operator-(Vec3 const &obj) const;
-
-    Vec3 operator-(float a) const;
-
-    Vec3 normalise() const;
-
-    float magnitude() const;
-
-    Vec3 cross(Vec3 a);
-};
-
-struct Mat4 {
-    float values[16];
-};
-
-
+SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, char *path, ShaderType shaderType,
+                                     int num_uniform_buffers = 0);
 #endif //COMMON_H

@@ -10,13 +10,22 @@ find_package(glm CONFIG REQUIRED)
 
 
 add_executable(sdl3_engine src/main.cpp
-        src/vertex.h
+        src/engine_types.h
         src/common.h
         src/common.cpp
         src/camera.cpp
         src/camera.h
         src/InputManager.cpp
         src/InputManager.h
+        src/old_main.cpp
+        src/Engine.cpp
+        src/Engine.h
+        src/Renderer.cpp
+        src/Renderer.h
+        src/Model.cpp
+        src/Model.h
+        src/CameraController.cpp
+        src/CameraController.h
 )
 
 target_link_libraries(sdl3_engine PRIVATE SDL3::SDL3)
