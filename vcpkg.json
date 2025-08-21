@@ -1,0 +1,15 @@
+{
+  "name": "sdl3-engine",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "glm",
+    {
+      "name": "sdl3",
+      "features": [
+        "vulkan"
+      ]
+    },
+    "sdl3-image",
+    "sdl3-ttf"
+  ]
+}
