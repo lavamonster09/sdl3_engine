@@ -4,10 +4,14 @@
 
 #include "Model.h"
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
 #include "Camera.h"
 #include "common.h"
 
-Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<Uint16> &indexes_, glm::mat4 model) {
+
+Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<Uint32> &indexes_, glm::mat4 model) {
     model_mat = model;
     vertices = vertices_;
     indexes = indexes_;
@@ -26,7 +30,32 @@ Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<
 
     SDL_GPUBufferRegion index_buffer_region{};
     index_buffer_region.buffer = mesh_buffer.index_buffer;
-    index_buffer_region.size = indexes.size() * sizeof(Uint16);
+    index_buffer_region.size = indexes.size() * sizeof(Uint32);
+    index_buffer_region.offset = 0;
+
+    SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.index_buffer_location, &index_buffer_region, false);
+
+    SDL_EndGPUCopyPass(copy_pass);
+    SDL_SubmitGPUCommandBuffer(command_buffer);
+}
+
+Model::Model(SDL_GPUDevice *device, char *model_path, glm::mat4 model) {
+    model_mat = model;
+    std::tie(mesh_buffer, vertices, indexes) = create_mesh_buffer_from_path(device, model_path);
+
+    SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
+    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
+
+    SDL_GPUBufferRegion vertex_buffer_region{};
+    vertex_buffer_region.buffer = mesh_buffer.vertex_buffer;
+    vertex_buffer_region.size = vertices.size() * sizeof(Vertex);
+    vertex_buffer_region.offset = 0;
+
+    SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.vertex_buffer_location, &vertex_buffer_region, false);
+
+    SDL_GPUBufferRegion index_buffer_region{};
+    index_buffer_region.buffer = mesh_buffer.index_buffer;
+    index_buffer_region.size = indexes.size() * sizeof(Uint32);
     index_buffer_region.offset = 0;
 
     SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.index_buffer_location, &index_buffer_region, false);
@@ -45,12 +74,14 @@ void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandB
     index_buffer_bindings[0].offset = 0;
 
     SDL_BindGPUVertexBuffers(render_pass, 0, vertex_buffer_bindings, 1);
-    SDL_BindGPUIndexBuffer(render_pass, index_buffer_bindings, SDL_GPU_INDEXELEMENTSIZE_16BIT);
-
+    SDL_BindGPUIndexBuffer(render_pass, index_buffer_bindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+    float lightX = sin(SDL_GetTicks() / 500.0f) * 5.0f;
+    float lightZ = cos(SDL_GetTicks() / 500.0f) * 5.0f;
     ModelUniformBuffer uniform_buffer{
         .model = model_mat,
         .view = camera.view,
-        .projection = camera.projection
+        .projection = camera.projection,
+        .light_pos = {lightX, 1.0f, lightZ}
     };
 
     SDL_PushGPUVertexUniformData(command_buffer, 0, &uniform_buffer, sizeof(ModelUniformBuffer));

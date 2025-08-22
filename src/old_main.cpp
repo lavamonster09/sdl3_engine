@@ -70,7 +70,7 @@ static std::array<Vertex, 36> vertices = {
 };
 
 
-static std::array<Uint16, 36> indexes = {
+static std::array<Uint32, 36> indexes = {
     0, 2, 1, 3, 5, 4, // back face
     6, 8, 7, 9, 11, 10, // front face
     12, 14, 13, 15, 17, 16, // left face
@@ -168,7 +168,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     Vertex *data = (Vertex *) SDL_MapGPUTransferBuffer(device, transfer_buffer, false);
 
     SDL_memcpy(data, vertices.data(), sizeof(vertices));
-    Uint16 *index_data = (Uint16 *) &data[vertices.size()];
+    Uint32 *index_data = (Uint32 *) &data[vertices.size()];
     SDL_memcpy(index_data, indexes.data(), sizeof(indexes));
     // index_data[0] = 0;
     // index_data[1] = 1;

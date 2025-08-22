@@ -29,6 +29,7 @@ struct ModelUniformBuffer {
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
+    glm::vec3 light_pos;
     // you can add other properties here
 };
 

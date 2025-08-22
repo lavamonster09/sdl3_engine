@@ -10,7 +10,7 @@
 
 #include "Camera.h"
 #include "engine_types.h"
-
+#include "Model.h"
 
 class Renderer {
     SDL_Window *window = nullptr;
@@ -20,6 +20,7 @@ class Renderer {
     SDL_GPUGraphicsPipeline *graphics_pipeline = nullptr;
     ModelUniformBuffer uniform_buffer = {};
     SDL_GPUTexture *depth_texture = nullptr;
+    Model *monkey = nullptr;
 
 public:
     void init();
