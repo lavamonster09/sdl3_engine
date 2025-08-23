@@ -5,6 +5,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 #include <array>
+#include <string>
 #include <vector>
 #include <SDL3/SDL.h>
 
@@ -17,9 +18,9 @@ SDL_GPUTransferBuffer *create_transfer_buffer(SDL_GPUDevice *device, Uint32 size
 MeshBuffer create_mesh_buffer(SDL_GPUDevice *device, std::vector<Vertex> &vertices,
                               std::vector<Uint32> &indexes);
 
-SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, char *path, ShaderType shaderType,
+SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, ShaderType shaderType,
                                      int num_uniform_buffers = 0);
 
 std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_buffer_from_path(
-    SDL_GPUDevice *device, char *path);
+    SDL_GPUDevice *device, std::string path);
 #endif //COMMON_H

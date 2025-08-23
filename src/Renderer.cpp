@@ -6,76 +6,9 @@
 #include "common.h"
 #include "glm/glm.hpp"
 #include <array>
-#include <glm/ext/quaternion_transform.hpp>
 
 #include "engine_types.h"
 #include "Model.h"
-
-struct UniformBuffer {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 projection;
-    // you can add other properties here
-};
-
-static std::vector<Vertex> vertices = {
-    // Back face (Z-)
-    Vertex{-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, -0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-
-    // Front face (Z+)
-    {-0.5f, -0.5f, 0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 0, 0, 1},
-    {-0.5f, 0.5f, 0.5f, 1, 1, 0, 1},
-    // Left face (X-)
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {-0.5f, 0.5f, -0.5f, 0, 1, 0, 1},
-    {-0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    // Right face (X+)
-    {0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    // Bottom face (Y-)
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-
-    // Top face (Y+)
-    {-0.5f, 0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-
-    {0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, 0.5f, -0.5f, 1, 0, 0, 1}
-};
-
-
-static std::vector<Uint32> indexes = {
-    0, 2, 1, 3, 5, 4, // back face
-    6, 8, 7, 9, 11, 10, // front face
-    12, 14, 13, 15, 17, 16, // left face
-    18, 20, 19, 21, 23, 22, // right face
-    24, 25, 26, 27, 28, 29, // bottom face
-    30, 32, 31, 33, 35, 34 // top face
-};
 
 void Renderer::init() {
     window = SDL_CreateWindow("name", 1600, 900, SDL_WINDOW_RESIZABLE);
@@ -105,7 +38,7 @@ void Renderer::init() {
     pipeline_info.vertex_input_state.num_vertex_buffers = 1;
     pipeline_info.vertex_input_state.vertex_buffer_descriptions = vertex_buffer_descriptions;
 
-    SDL_GPUVertexAttribute vertex_attributes[2];
+    SDL_GPUVertexAttribute vertex_attributes[3];
 
     // a_position
     vertex_attributes[0].buffer_slot = 0;
@@ -113,11 +46,17 @@ void Renderer::init() {
     vertex_attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
     vertex_attributes[0].offset = 0;
 
-    // a_color
+    // a_normal
     vertex_attributes[1].buffer_slot = 0;
     vertex_attributes[1].location = 1;
     vertex_attributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
     vertex_attributes[1].offset = sizeof(float) * 3;
+
+    // a_uvs
+    vertex_attributes[2].buffer_slot = 0;
+    vertex_attributes[2].location = 1;
+    vertex_attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+    vertex_attributes[2].offset = sizeof(float) * 6;
 
     pipeline_info.vertex_input_state.num_vertex_attributes = 2;
     pipeline_info.vertex_input_state.vertex_attributes = vertex_attributes;
@@ -155,7 +94,6 @@ void Renderer::init() {
         device,
         &texture_create_info
     );
-    monkey = new Model{device, "../assets/Datsun_280Z.obj", glm::mat4(1.0f)};
     graphics_pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
 
     SDL_ReleaseGPUShader(device, vertex_shader);
@@ -208,9 +146,19 @@ void Renderer::draw(Camera &camera) {
     SDL_BindGPUGraphicsPipeline(render_pass, graphics_pipeline);
 
     camera.update();
-    monkey->draw(render_pass, camera, command_buffer);
+    float lightX = sin(SDL_GetTicks() / 500.0f) * 6.0f;
+    float lightZ = cos(SDL_GetTicks() / 500.0f) * 6.0f;
+    models["light"]->update_pos({lightX, 1.0f, lightZ});
+    for (auto &[key, model]: models) {
+        model->draw(render_pass, camera, command_buffer);
+    }
 
     SDL_EndGPURenderPass(render_pass);
 
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
+
+void Renderer::add_model(std::string key, std::string path) {
+    models[key] = new Model(device, path);
+}
+

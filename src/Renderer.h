@@ -4,6 +4,7 @@
 
 #ifndef RENDERER_H
 #define RENDERER_H
+#include <unordered_map>
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
@@ -20,14 +21,14 @@ class Renderer {
     SDL_GPUGraphicsPipeline *graphics_pipeline = nullptr;
     ModelUniformBuffer uniform_buffer = {};
     SDL_GPUTexture *depth_texture = nullptr;
-    Model *monkey = nullptr;
+    std::unordered_map<std::string, Model *> models;
 
 public:
     void init();
 
     void draw(Camera &camera);
 
-    // create buffers
+    void add_model(std::string key, std::string path);
 };
 
 

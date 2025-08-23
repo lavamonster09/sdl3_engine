@@ -8,64 +8,6 @@
 #include <vector>
 #include <iostream>
 
-static std::vector<Vertex> vertices_ = {
-    // Back face (Z-)
-    Vertex{-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, -0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-
-    // Front face (Z+)
-    {-0.5f, -0.5f, 0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 0, 0, 1},
-    {-0.5f, 0.5f, 0.5f, 1, 1, 0, 1},
-    // Left face (X-)
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {-0.5f, 0.5f, -0.5f, 0, 1, 0, 1},
-    {-0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    // Right face (X+)
-    {0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 0, 1, 1},
-    {0.5f, 0.5f, 0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    // Bottom face (Y-)
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, -0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {0.5f, -0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, -0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, -0.5f, -0.5f, 1, 0, 0, 1},
-
-    // Top face (Y+)
-    {-0.5f, 0.5f, -0.5f, 1, 0, 0, 1},
-    {0.5f, 0.5f, -0.5f, 0, 1, 0, 1},
-    {0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-
-    {0.5f, 0.5f, 0.5f, 0, 0, 1, 1},
-    {-0.5f, 0.5f, 0.5f, 1, 1, 0, 1},
-    {-0.5f, 0.5f, -0.5f, 1, 0, 0, 1}
-};
-
-static std::vector<Uint32> indexes_ = {
-    0, 2, 1, 3, 5, 4, // back face
-    6, 8, 7, 9, 11, 10, // front face
-    12, 14, 13, 15, 17, 16, // left face
-    18, 20, 19, 21, 23, 22, // right face
-    24, 25, 26, 27, 28, 29, // bottom face
-    30, 32, 31, 33, 35, 34 // top face
-};
-
 SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage) {
     SDL_GPUBufferCreateInfo buffer_info{
         .usage = usage,
@@ -84,7 +26,6 @@ SDL_GPUTransferBuffer *create_transfer_buffer(SDL_GPUDevice *device, Uint32 size
 
 MeshBuffer create_mesh_buffer(SDL_GPUDevice *device, std::vector<Vertex> &vertices,
                               std::vector<Uint32> &indexes) {
-    std::cout << indexes[1] << std::endl;
     SDL_GPUBuffer *vertex_buffer = create_buffer(device, vertices.size() * sizeof(Vertex), SDL_GPU_BUFFERUSAGE_VERTEX);
     SDL_GPUBuffer *index_buffer = create_buffer(device, indexes.size() * sizeof(Uint32), SDL_GPU_BUFFERUSAGE_INDEX);
     SDL_GPUTransferBuffer *transfer_buffer = create_transfer_buffer(
@@ -112,10 +53,10 @@ MeshBuffer create_mesh_buffer(SDL_GPUDevice *device, std::vector<Vertex> &vertic
     };
 }
 
-SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, char *path, ShaderType shaderType,
+SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, ShaderType shaderType,
                                      int num_uniform_buffers) {
     size_t shader_code_size;
-    void *shader_code = SDL_LoadFile(path, &shader_code_size);
+    void *shader_code = SDL_LoadFile(path.c_str(), &shader_code_size);
 
     SDL_GPUShaderCreateInfo shader_info{};
     shader_info.code = (Uint8 *) shader_code;
@@ -137,7 +78,7 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, char *path, ShaderTy
 }
 
 std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_buffer_from_path(
-    SDL_GPUDevice *device, char *path) {
+    SDL_GPUDevice *device, std::string path) {
     std::vector<Vertex> vertices;
     std::vector<Uint32> indexes;
 
@@ -147,7 +88,7 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
     std::string error;
     std::string warn;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &error, path)) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &error, path.c_str())) {
         throw std::runtime_error(error);
     }
 
@@ -160,7 +101,8 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
                 attrib.normals[3 * index.normal_index + 0],
                 attrib.normals[3 * index.normal_index + 1],
                 attrib.normals[3 * index.normal_index + 2],
-                1.0f
+                attrib.texcoords[2 * index.texcoord_index + 0],
+                attrib.texcoords[2 * index.texcoord_index + 0]
             };
             vertices.push_back(vertex);
 
@@ -170,3 +112,4 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
 
     return {create_mesh_buffer(device, vertices, indexes), vertices, indexes};
 }
+

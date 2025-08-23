@@ -10,14 +10,7 @@
 #include "Camera.h"
 #include "common.h"
 
-
-Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<Uint32> &indexes_, glm::mat4 model) {
-    model_mat = model;
-    vertices = vertices_;
-    indexes = indexes_;
-    mesh_buffer = create_mesh_buffer(device, vertices, indexes);
-
-
+void Model::upload_buffers_(SDL_GPUDevice *device) {
     SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
     SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
 
@@ -39,29 +32,24 @@ Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-Model::Model(SDL_GPUDevice *device, char *model_path, glm::mat4 model) {
-    model_mat = model;
+Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<Uint32> &indexes_, glm::vec3 pos,
+             float rotation, glm::vec3 axis) {
+    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation, axis), pos);
+    pos_ = pos;
+    rotation_ = rotation;
+    rotation_axis_ = axis;
+    vertices = vertices_;
+    indexes = indexes_;
+    mesh_buffer = create_mesh_buffer(device, vertices, indexes);
+
+    upload_buffers_(device);
+}
+
+Model::Model(SDL_GPUDevice *device, std::string model_path, glm::vec3 pos, float rotation, glm::vec3 axis) {
+    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation, axis), pos);
     std::tie(mesh_buffer, vertices, indexes) = create_mesh_buffer_from_path(device, model_path);
 
-    SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
-    SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
-
-    SDL_GPUBufferRegion vertex_buffer_region{};
-    vertex_buffer_region.buffer = mesh_buffer.vertex_buffer;
-    vertex_buffer_region.size = vertices.size() * sizeof(Vertex);
-    vertex_buffer_region.offset = 0;
-
-    SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.vertex_buffer_location, &vertex_buffer_region, false);
-
-    SDL_GPUBufferRegion index_buffer_region{};
-    index_buffer_region.buffer = mesh_buffer.index_buffer;
-    index_buffer_region.size = indexes.size() * sizeof(Uint32);
-    index_buffer_region.offset = 0;
-
-    SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.index_buffer_location, &index_buffer_region, false);
-
-    SDL_EndGPUCopyPass(copy_pass);
-    SDL_SubmitGPUCommandBuffer(command_buffer);
+    upload_buffers_(device);
 }
 
 void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandBuffer *command_buffer) {
@@ -87,4 +75,15 @@ void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandB
     SDL_PushGPUVertexUniformData(command_buffer, 0, &uniform_buffer, sizeof(ModelUniformBuffer));
 
     SDL_DrawGPUIndexedPrimitives(render_pass, indexes.size(), 1, 0, 0, 0);
+}
+
+void Model::update_pos(glm::vec3 pos) {
+    pos_ = pos;
+    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation_, rotation_axis_), pos);
+}
+
+void Model::update_rotation(float angle, glm::vec3 axis) {
+    rotation_axis_ = axis;
+    rotation_ = angle;
+    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation_, rotation_axis_), pos_);
 }

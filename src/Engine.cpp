@@ -9,6 +9,9 @@
 void Engine::init() {
     camera_controller = new CameraController();
     renderer.init();
+    renderer.add_model("car", "../assets/Datsun_280Z.obj");
+    renderer.add_model("floor", "../assets/Floor.obj");
+    renderer.add_model("light", "../assets/Sphere.obj");
 }
 
 void Engine::game_loop() {
