@@ -54,7 +54,7 @@ MeshBuffer create_mesh_buffer(SDL_GPUDevice *device, std::vector<Vertex> &vertic
 }
 
 SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, ShaderType shaderType,
-                                     int num_uniform_buffers) {
+                                     int num_uniform_buffers, int num_samplers) {
     size_t shader_code_size;
     void *shader_code = SDL_LoadFile(path.c_str(), &shader_code_size);
 
@@ -68,7 +68,7 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, Sh
     } else if (shaderType == FRAGMENT_SHADER) {
         shader_info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
     }
-    shader_info.num_samplers = 0;
+    shader_info.num_samplers = num_samplers;
     shader_info.num_storage_buffers = 0;
     shader_info.num_storage_textures = 0;
     shader_info.num_uniform_buffers = num_uniform_buffers;
@@ -102,7 +102,7 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
                 attrib.normals[3 * index.normal_index + 1],
                 attrib.normals[3 * index.normal_index + 2],
                 attrib.texcoords[2 * index.texcoord_index + 0],
-                attrib.texcoords[2 * index.texcoord_index + 0]
+                attrib.texcoords[2 * index.texcoord_index + 1]
             };
             vertices.push_back(vertex);
 
@@ -113,3 +113,64 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
     return {create_mesh_buffer(device, vertices, indexes), vertices, indexes};
 }
 
+std::tuple<SDL_GPUTexture *, SDL_Surface *, SDL_GPUTextureTransferInfo, SDL_GPUTransferBuffer *> create_texture_image(
+    SDL_GPUDevice *device, const std::string &path) {
+    SDL_Surface *image_data = LoadImage(path.c_str(), 4);
+
+    SDL_GPUTextureCreateInfo texture_create_info{};
+    texture_create_info.type = SDL_GPU_TEXTURETYPE_2D;
+    texture_create_info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+    texture_create_info.width = image_data->w;
+    texture_create_info.height = image_data->h;
+    texture_create_info.layer_count_or_depth = 1;
+    texture_create_info.num_levels = 1;
+    texture_create_info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+
+    SDL_GPUTransferBuffer *transfer_buffer = create_transfer_buffer(
+        device, image_data->w * image_data->h * 4,
+        SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD);
+
+    Uint8 *transfer_ptr = (Uint8 *) SDL_MapGPUTransferBuffer(
+        device,
+        transfer_buffer,
+        false
+    );
+
+    SDL_GPUTextureTransferInfo texture_transfer_info{};
+    texture_transfer_info.transfer_buffer = transfer_buffer;
+    texture_transfer_info.offset = 0;
+
+    SDL_memcpy(transfer_ptr, image_data->pixels, image_data->w * image_data->h * 4);
+    SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
+
+    SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
+
+    return {texture, image_data, texture_transfer_info, transfer_buffer};
+}
+
+
+SDL_Surface *LoadImage(const char *path, int desiredChannels) {
+    SDL_Surface *result;
+    SDL_PixelFormat format;
+
+    result = SDL_LoadBMP(path);
+    if (result == NULL) {
+        SDL_Log("Failed to load BMP: %s", SDL_GetError());
+        return NULL;
+    }
+
+    if (desiredChannels == 4) {
+        format = SDL_PIXELFORMAT_ABGR8888;
+    } else {
+        SDL_assert(!"Unexpected desiredChannels");
+        SDL_DestroySurface(result);
+        return NULL;
+    }
+    if (result->format != format) {
+        SDL_Surface *next = SDL_ConvertSurface(result, format);
+        SDL_DestroySurface(result);
+        result = next;
+    }
+
+    return result;
+}

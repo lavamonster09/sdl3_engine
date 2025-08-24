@@ -22,13 +22,14 @@ class Renderer {
     ModelUniformBuffer uniform_buffer = {};
     SDL_GPUTexture *depth_texture = nullptr;
     std::unordered_map<std::string, Model *> models;
+    SDL_GPUSampler *sampler;
 
 public:
     void init();
 
     void draw(Camera &camera);
 
-    void add_model(std::string key, std::string path);
+    void add_model(std::string key, std::string model_path, std::string texture_path);
 };
 
 

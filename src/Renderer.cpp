@@ -6,12 +6,13 @@
 #include "common.h"
 #include "glm/glm.hpp"
 #include <array>
+#include <utility>
 
 #include "engine_types.h"
 #include "Model.h"
 
 void Renderer::init() {
-    window = SDL_CreateWindow("name", 1600, 900, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("name", 1600, 900, SDL_WINDOW_VULKAN);
     device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, nullptr);
     SDL_ClaimWindowForGPUDevice(device, window);
     SDL_SetWindowRelativeMouseMode(window, true);
@@ -19,9 +20,8 @@ void Renderer::init() {
 
     vertex_shader = load_shader_from_file(device, "./shaders/vertex.vert.spv",
                                           VERTEX_SHADER, 1);
-    fragment_shader = load_shader_from_file(
-        device, "./shaders/fragment.frag.spv",
-        FRAGMENT_SHADER, 0);
+    fragment_shader = load_shader_from_file(device, "./shaders/fragment.frag.spv",
+                                            FRAGMENT_SHADER, 0, 1);
 
     SDL_GPUGraphicsPipelineCreateInfo pipeline_info{
         .vertex_shader = vertex_shader,
@@ -54,13 +54,12 @@ void Renderer::init() {
 
     // a_uvs
     vertex_attributes[2].buffer_slot = 0;
-    vertex_attributes[2].location = 1;
+    vertex_attributes[2].location = 2;
     vertex_attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
     vertex_attributes[2].offset = sizeof(float) * 6;
 
-    pipeline_info.vertex_input_state.num_vertex_attributes = 2;
+    pipeline_info.vertex_input_state.num_vertex_attributes = 3;
     pipeline_info.vertex_input_state.vertex_attributes = vertex_attributes;
-
     SDL_GPUColorTargetDescription color_target_descriptions[1];
     color_target_descriptions[0] = {};
     color_target_descriptions[0].format = SDL_GetGPUSwapchainTextureFormat(device, window);
@@ -94,7 +93,20 @@ void Renderer::init() {
         device,
         &texture_create_info
     );
+
+    SDL_GPUSamplerCreateInfo sampler_create_info{
+        .min_filter = SDL_GPU_FILTER_NEAREST,
+        .mag_filter = SDL_GPU_FILTER_NEAREST,
+        .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
+        .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+        .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+        .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+    };
+
+
     graphics_pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
+
+    sampler = SDL_CreateGPUSampler(device, &sampler_create_info);
 
     SDL_ReleaseGPUShader(device, vertex_shader);
     SDL_ReleaseGPUShader(device, fragment_shader);
@@ -150,7 +162,7 @@ void Renderer::draw(Camera &camera) {
     float lightZ = cos(SDL_GetTicks() / 500.0f) * 6.0f;
     models["light"]->update_pos({lightX, 1.0f, lightZ});
     for (auto &[key, model]: models) {
-        model->draw(render_pass, camera, command_buffer);
+        model->draw(render_pass, sampler, camera, command_buffer);
     }
 
     SDL_EndGPURenderPass(render_pass);
@@ -158,7 +170,7 @@ void Renderer::draw(Camera &camera) {
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-void Renderer::add_model(std::string key, std::string path) {
-    models[key] = new Model(device, path);
+void Renderer::add_model(std::string key, std::string model_path, std::string texture_path) {
+    models[key] = new Model(device, model_path, texture_path);
 }
 

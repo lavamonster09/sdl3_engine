@@ -5,6 +5,7 @@
 #include "Model.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
+#include <iostream>
 #include <tiny_obj_loader.h>
 
 #include "Camera.h"
@@ -28,8 +29,19 @@ void Model::upload_buffers_(SDL_GPUDevice *device) {
 
     SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.index_buffer_location, &index_buffer_region, false);
 
+    SDL_GPUTextureRegion texture_buffer_region{};
+    texture_buffer_region.texture = texture;
+    texture_buffer_region.w = image_data->w;
+    texture_buffer_region.h = image_data->h;
+    texture_buffer_region.d = 1;
+
+    SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_buffer_region, false);
+
     SDL_EndGPUCopyPass(copy_pass);
     SDL_SubmitGPUCommandBuffer(command_buffer);
+    SDL_DestroySurface(image_data);
+    SDL_ReleaseGPUTransferBuffer(device, mesh_buffer.transfer_buffer);
+    SDL_ReleaseGPUTransferBuffer(device, texture_transfer_buffer);
 }
 
 Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<Uint32> &indexes_, glm::vec3 pos,
@@ -45,14 +57,18 @@ Model::Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices_, std::vector<
     upload_buffers_(device);
 }
 
-Model::Model(SDL_GPUDevice *device, std::string model_path, glm::vec3 pos, float rotation, glm::vec3 axis) {
+Model::Model(SDL_GPUDevice *device, std::string model_path, std::string texture_path, glm::vec3 pos, float rotation,
+             glm::vec3 axis) {
     model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation, axis), pos);
     std::tie(mesh_buffer, vertices, indexes) = create_mesh_buffer_from_path(device, model_path);
+    std::tie(texture, image_data, texture_transfer_info, texture_transfer_buffer) = create_texture_image(
+        device, texture_path);
 
     upload_buffers_(device);
 }
 
-void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandBuffer *command_buffer) {
+void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera &camera,
+                 SDL_GPUCommandBuffer *command_buffer) {
     SDL_GPUBufferBinding vertex_buffer_bindings[1];
     vertex_buffer_bindings[0].buffer = mesh_buffer.vertex_buffer;
     vertex_buffer_bindings[0].offset = 0;
@@ -60,6 +76,10 @@ void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandB
     SDL_GPUBufferBinding index_buffer_bindings[1];
     index_buffer_bindings[0].buffer = mesh_buffer.index_buffer;
     index_buffer_bindings[0].offset = 0;
+
+    SDL_GPUTextureSamplerBinding texture_sampler_bindings[1];
+    texture_sampler_bindings[0].texture = texture;
+    texture_sampler_bindings[0].sampler = sampler;
 
     SDL_BindGPUVertexBuffers(render_pass, 0, vertex_buffer_bindings, 1);
     SDL_BindGPUIndexBuffer(render_pass, index_buffer_bindings, SDL_GPU_INDEXELEMENTSIZE_32BIT);
@@ -72,8 +92,8 @@ void Model::draw(SDL_GPURenderPass *render_pass, Camera &camera, SDL_GPUCommandB
         .light_pos = {lightX, 1.0f, lightZ}
     };
 
+    SDL_BindGPUFragmentSamplers(render_pass, 0, texture_sampler_bindings, 1);
     SDL_PushGPUVertexUniformData(command_buffer, 0, &uniform_buffer, sizeof(ModelUniformBuffer));
-
     SDL_DrawGPUIndexedPrimitives(render_pass, indexes.size(), 1, 0, 0, 0);
 }
 
