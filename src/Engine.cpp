@@ -9,9 +9,12 @@
 void Engine::init() {
     camera_controller = new CameraController();
     renderer.init();
-    renderer.add_model("car", "../assets/Datsun_280Z.obj", "../assets/image.bmp");
-    renderer.add_model("floor", "../assets/Floor.obj", "../assets/1.bmp");
-    renderer.add_model("light", "../assets/Sphere.obj", "../assets/image.bmp");
+    renderer.add_model("car", "../assets/Socrates.obj", "../assets/1001_Base_Color.bmp");
+    renderer.models["car"]->update_scale(0.05f);
+    renderer.add_model("floor", "../assets/Floor.obj", "../assets/texture.bmp");
+    renderer.add_model("light", "../assets/Sphere.obj", "../assets/texture.bmp");
+
+    renderer.models["floor"]->update_scale(2.0f);
 }
 
 void Engine::game_loop() {

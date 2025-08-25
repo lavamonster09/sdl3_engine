@@ -157,8 +157,8 @@ void Renderer::draw(Camera &camera) {
     SDL_BindGPUGraphicsPipeline(render_pass, graphics_pipeline);
 
     camera.update();
-    float lightX = sin(SDL_GetTicks() / 500.0f) * 6.0f;
-    float lightZ = cos(SDL_GetTicks() / 500.0f) * 6.0f;
+    float lightX = sin(SDL_GetTicks() / 500.0f) * 5.0f;
+    float lightZ = cos(SDL_GetTicks() / 500.0f) * 5.0f;
     models["light"]->update_pos({lightX, 1.0f, lightZ});
     for (auto &[key, model]: models) {
         model->draw(render_pass, sampler, camera, command_buffer);

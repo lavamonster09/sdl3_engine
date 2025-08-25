@@ -98,11 +98,28 @@ void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera
 
 void Model::update_pos(glm::vec3 pos) {
     pos_ = pos;
-    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation_, rotation_axis_), pos);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, pos_);
+    trans = glm::rotate(trans, rotation_, rotation_axis_);
+    trans = glm::scale(trans, glm::vec3(scale_, scale_, scale_));
+    model_mat = trans;
 }
 
 void Model::update_rotation(float angle, glm::vec3 axis) {
     rotation_axis_ = axis;
     rotation_ = angle;
-    model_mat = glm::translate(glm::rotate(glm::mat4(1.0f), rotation_, rotation_axis_), pos_);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, pos_);
+    trans = glm::rotate(trans, rotation_, rotation_axis_);
+    trans = glm::scale(trans, glm::vec3(scale_, scale_, scale_));
+    model_mat = trans;
+}
+
+void Model::update_scale(float scale) {
+    scale_ = scale;
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, pos_);
+    trans = glm::rotate(trans, rotation_, rotation_axis_);
+    trans = glm::scale(trans, glm::vec3(scale_, scale_, scale_));
+    model_mat = trans;
 }

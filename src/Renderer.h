@@ -21,10 +21,11 @@ class Renderer {
     SDL_GPUGraphicsPipeline *graphics_pipeline = nullptr;
     ModelUniformBuffer uniform_buffer = {};
     SDL_GPUTexture *depth_texture = nullptr;
-    std::unordered_map<std::string, Model *> models;
     SDL_GPUSampler *sampler;
 
 public:
+    std::unordered_map<std::string, Model *> models;
+    
     void init();
 
     void draw(Camera &camera);

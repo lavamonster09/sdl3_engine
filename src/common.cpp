@@ -102,7 +102,7 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
                 attrib.normals[3 * index.normal_index + 1],
                 attrib.normals[3 * index.normal_index + 2],
                 attrib.texcoords[2 * index.texcoord_index + 0],
-                attrib.texcoords[2 * index.texcoord_index + 1]
+                1 - attrib.texcoords[2 * index.texcoord_index + 1]
             };
             vertices.push_back(vertex);
 
@@ -143,7 +143,7 @@ std::tuple<SDL_GPUTexture *, SDL_Surface *, SDL_GPUTextureTransferInfo, SDL_GPUT
     SDL_memcpy(transfer_ptr, image_data->pixels, image_data->w * image_data->h * 4);
     SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
 
-    SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
+     SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
 
     return {texture, image_data, texture_transfer_info, transfer_buffer};
 }
