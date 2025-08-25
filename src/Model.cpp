@@ -28,7 +28,6 @@ void Model::upload_buffers_(SDL_GPUDevice *device) {
     index_buffer_region.offset = 0;
 
     SDL_UploadToGPUBuffer(copy_pass, &mesh_buffer.index_buffer_location, &index_buffer_region, false);
-
     SDL_GPUTextureRegion texture_buffer_region{};
     texture_buffer_region.texture = texture;
     texture_buffer_region.w = image_data->w;

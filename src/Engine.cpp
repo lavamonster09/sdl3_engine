@@ -10,7 +10,7 @@ void Engine::init() {
     camera_controller = new CameraController();
     renderer.init();
     renderer.add_model("car", "../assets/Datsun_280Z.obj", "../assets/image.bmp");
-    renderer.add_model("floor", "../assets/Floor.obj", "../assets/image.bmp");
+    renderer.add_model("floor", "../assets/Floor.obj", "../assets/1.bmp");
     renderer.add_model("light", "../assets/Sphere.obj", "../assets/image.bmp");
 }
 

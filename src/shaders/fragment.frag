@@ -6,7 +6,7 @@ layout (location = 2) in vec3 v_light_pos;
 layout (location = 3) in vec2 v_uv;
 layout (location = 0) out vec4 FragColor;
 
-layout (set = 1, binding = 0) uniform sampler2D texSampler;
+layout (set = 2,binding = 0) uniform sampler2D texSampler;
 
 
 void main() {
@@ -17,6 +17,6 @@ void main() {
     float diff = max(dot(normal, light_direction), 0.0);
     vec3 diffuse = diff * vec3(1.0f, 1.0f, 1.0f);
 
-    vec3 result = (vec3(0.1f, 0.1f, 0.1f) + diffuse) * vec3(v_uv, 0.0f);
+    vec3 result = (vec3(0.1f, 0.1f, 0.1f) + diffuse) * t.rgb;
     FragColor = vec4(result, 1.0);
 }

@@ -94,6 +94,8 @@ void Renderer::init() {
         &texture_create_info
     );
 
+    graphics_pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
+
     SDL_GPUSamplerCreateInfo sampler_create_info{
         .min_filter = SDL_GPU_FILTER_NEAREST,
         .mag_filter = SDL_GPU_FILTER_NEAREST,
@@ -102,9 +104,6 @@ void Renderer::init() {
         .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
         .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
     };
-
-
-    graphics_pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
 
     sampler = SDL_CreateGPUSampler(device, &sampler_create_info);
 
