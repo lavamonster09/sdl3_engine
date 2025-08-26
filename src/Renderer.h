@@ -30,7 +30,7 @@ public:
 
     void draw(Camera &camera);
 
-    void add_model(std::string key, std::string model_path, std::string texture_path);
+    void add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path);
 };
 
 

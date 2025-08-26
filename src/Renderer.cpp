@@ -21,7 +21,7 @@ void Renderer::init() {
     vertex_shader = load_shader_from_file(device, "./shaders/vertex.vert.spv",
                                           VERTEX_SHADER, 1);
     fragment_shader = load_shader_from_file(device, "./shaders/fragment.frag.spv",
-                                            FRAGMENT_SHADER, 0, 1);
+                                            FRAGMENT_SHADER, 0, 2);
 
     SDL_GPUGraphicsPipelineCreateInfo pipeline_info{
         .vertex_shader = vertex_shader,
@@ -157,9 +157,6 @@ void Renderer::draw(Camera &camera) {
     SDL_BindGPUGraphicsPipeline(render_pass, graphics_pipeline);
 
     camera.update();
-    float lightX = sin(SDL_GetTicks() / 500.0f) * 5.0f;
-    float lightZ = cos(SDL_GetTicks() / 500.0f) * 5.0f;
-    models["light"]->update_pos({lightX, 1.0f, lightZ});
     for (auto &[key, model]: models) {
         model->draw(render_pass, sampler, camera, command_buffer);
     }
@@ -169,7 +166,7 @@ void Renderer::draw(Camera &camera) {
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-void Renderer::add_model(std::string key, std::string model_path, std::string texture_path) {
-    models[key] = new Model(device, model_path, texture_path);
+void Renderer::add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path) {
+    models[key] = new Model(device, model_path, texture_path, normal_path);
 }
 

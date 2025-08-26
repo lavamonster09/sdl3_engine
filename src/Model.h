@@ -27,16 +27,14 @@ public:
     std::vector<Vertex> vertices;
     std::vector<Uint32> indexes;
     glm::mat4 model_mat{};
-    SDL_Surface *image_data;
-    SDL_GPUTexture *texture = nullptr;
-    SDL_GPUTransferBuffer *texture_transfer_buffer;
-    SDL_GPUTextureTransferInfo texture_transfer_info;
+    Texture texture{};
+    Texture normal_map{};
 
 
     Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices, std::vector<Uint32> &indexes,
           glm::vec3 pos = {0.0f, 0.0f, 0.0f}, float rotation = 90.0f, glm::vec3 axis = {0.0f, 0.0f, 0.0f});
 
-    Model(SDL_GPUDevice *device, std::string model_path, std::string texture_path, glm::vec3 pos = {0.0f, 0.0f, 0.0f},
+    Model(SDL_GPUDevice *device, std::string model_path, std::string texture_path, std::string normal_path, glm::vec3 pos = {0.0f, 0.0f, 0.0f},
           float rotation = 0.0f,
           glm::vec3 axis = {0.0f, 0.0f, 0.0f});
 

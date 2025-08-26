@@ -24,8 +24,7 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, Sh
 std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_buffer_from_path(
     SDL_GPUDevice *device, std::string path);
 
-std::tuple<SDL_GPUTexture *, SDL_Surface *, SDL_GPUTextureTransferInfo, SDL_GPUTransferBuffer *>
-create_texture_image(SDL_GPUDevice *device, const std::string &path);
+Texture create_texture_image(SDL_GPUDevice *device, const std::string &path);
 
 SDL_Surface *LoadImage(const char *imageFilename, int desiredChannels);
 #endif //COMMON_H

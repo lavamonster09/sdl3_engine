@@ -9,12 +9,14 @@
 void Engine::init() {
     camera_controller = new CameraController();
     renderer.init();
-    renderer.add_model("car", "../assets/Socrates.obj", "../assets/1001_Base_Color.bmp");
+    renderer.add_model("car", "../assets/Socrates.obj", "../assets/1001_Base_Color.bmp", "../assets/1001_Normal_OpenGL.bmp");
     renderer.models["car"]->update_scale(0.05f);
-    renderer.add_model("floor", "../assets/Floor.obj", "../assets/texture.bmp");
-    renderer.add_model("light", "../assets/Sphere.obj", "../assets/texture.bmp");
-
+    renderer.add_model("floor", "../assets/Floor.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp");
     renderer.models["floor"]->update_scale(2.0f);
+    renderer.add_model("sphere", "../assets/Sphere.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp");
+    renderer.models["sphere"]->update_pos({0.0f, 5.0f, 3.0f});
+    renderer.add_model("sphere2", "../assets/Sphere.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp");
+    renderer.models["sphere2"]->update_pos({0.0f, 5.0f, -3.0f});
 }
 
 void Engine::game_loop() {

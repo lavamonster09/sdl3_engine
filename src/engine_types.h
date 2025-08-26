@@ -26,12 +26,27 @@ enum ShaderType {
     FRAGMENT_SHADER
 };
 
+struct PointLight {
+    glm::vec4 pos;
+    glm::vec4 color;
+};
+
 struct ModelUniformBuffer {
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
-    glm::vec3 light_pos;
+    glm::vec4 view_pos;
+    PointLight lights[4];
     // you can add other properties here
 };
+
+struct Texture {
+    SDL_Surface *image_data;
+    SDL_GPUTexture *texture;
+    SDL_GPUTransferBuffer *texture_transfer_buffer;
+    SDL_GPUTextureTransferInfo texture_transfer_info;
+};
+
+
 
 #endif //VERTEX_H

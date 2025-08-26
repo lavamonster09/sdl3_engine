@@ -7,6 +7,9 @@
 #include <tiny_obj_loader.h>
 #include <vector>
 #include <iostream>
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage) {
     SDL_GPUBufferCreateInfo buffer_info{
@@ -88,6 +91,8 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
     std::string error;
     std::string warn;
 
+
+
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &error, path.c_str())) {
         throw std::runtime_error(error);
     }
@@ -113,7 +118,7 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
     return {create_mesh_buffer(device, vertices, indexes), vertices, indexes};
 }
 
-std::tuple<SDL_GPUTexture *, SDL_Surface *, SDL_GPUTextureTransferInfo, SDL_GPUTransferBuffer *> create_texture_image(
+Texture create_texture_image(
     SDL_GPUDevice *device, const std::string &path) {
     SDL_Surface *image_data = LoadImage(path.c_str(), 4);
 
@@ -145,7 +150,7 @@ std::tuple<SDL_GPUTexture *, SDL_Surface *, SDL_GPUTextureTransferInfo, SDL_GPUT
 
      SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
 
-    return {texture, image_data, texture_transfer_info, transfer_buffer};
+    return Texture{image_data, texture, transfer_buffer, texture_transfer_info};
 }
 
 

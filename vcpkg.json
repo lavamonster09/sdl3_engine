@@ -11,6 +11,7 @@
     },
     "sdl3-image",
     "tinyobjloader",
-    "vulkan"
+    "vulkan",
+    "assimp"
   ]
 }

@@ -7,6 +7,7 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 add_executable(sdl3_engine src/main.cpp
         src/engine_types.h
@@ -58,4 +59,4 @@ target_link_libraries(sdl3_engine PRIVATE SDL3::SDL3)
 target_link_libraries(sdl3_engine PRIVATE $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>)
 target_link_libraries(sdl3_engine PRIVATE tinyobjloader::tinyobjloader)
 target_link_libraries(sdl3_engine PRIVATE glm::glm)
-
+target_link_libraries(sdl3_engine PRIVATE assimp::assimp)
