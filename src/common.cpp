@@ -7,9 +7,13 @@
 #include <tiny_obj_loader.h>
 #include <vector>
 #include <iostream>
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
+
+#include "Model.h"
+
 
 SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage) {
     SDL_GPUBufferCreateInfo buffer_info{
@@ -91,11 +95,16 @@ std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_bu
     std::string error;
     std::string warn;
 
-
+    Assimp::Importer importer;
 
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &error, path.c_str())) {
         throw std::runtime_error(error);
     }
+
+    const aiScene* scene = importer.ReadFile( path.c_str(),
+    aiProcess_CalcTangentSpace       |
+    aiProcess_Triangulate            |
+    aiProcess_FlipUVs);
 
     for (const auto &shape: shapes) {
         for (const auto &index: shape.mesh.indices) {

@@ -7,7 +7,8 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
+find_package(assimp REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 add_executable(sdl3_engine src/main.cpp
         src/engine_types.h
@@ -25,7 +26,12 @@ add_executable(sdl3_engine src/main.cpp
         src/Model.h
         src/CameraController.cpp
         src/CameraController.h
+        src/Mesh.cpp
+        src/Mesh.h
 )
+
+get_target_property(ASSIMP_IMPORTED_LOCATION assimp::assimp IMPORTED_LOCATION)
+message(STATUS "Assimp linked from: ${ASSIMP_IMPORTED_LOCATION}")
 
 function(add_shaders TARGET_NAME)
     set(SHADER_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/shaders")
@@ -60,3 +66,4 @@ target_link_libraries(sdl3_engine PRIVATE $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_
 target_link_libraries(sdl3_engine PRIVATE tinyobjloader::tinyobjloader)
 target_link_libraries(sdl3_engine PRIVATE glm::glm)
 target_link_libraries(sdl3_engine PRIVATE assimp::assimp)
+target_link_libraries(sdl3_engine PRIVATE imgui::imgui)

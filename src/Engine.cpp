@@ -17,6 +17,9 @@ void Engine::init() {
     renderer.models["sphere"]->update_pos({0.0f, 5.0f, 3.0f});
     renderer.add_model("sphere2", "../assets/Sphere.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp");
     renderer.models["sphere2"]->update_pos({0.0f, 5.0f, -3.0f});
+    renderer.add_light({0.0f, 5.0f, -3.0f}, {1.0f, 0.0f, 0.0f}, true);
+    renderer.add_light({0.0f, 5.0f, 3.0f}, {0.0f, 1.0f, 0.0f}, true);
+    renderer.add_light({3.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, true);
 }
 
 void Engine::game_loop() {

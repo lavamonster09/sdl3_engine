@@ -6,6 +6,8 @@
 #include "common.h"
 #include "glm/glm.hpp"
 #include <array>
+#include <iostream>
+#include <ostream>
 #include <utility>
 
 #include "engine_types.h"
@@ -68,7 +70,7 @@ void Renderer::init() {
     pipeline_info.target_info.color_target_descriptions = color_target_descriptions;
     pipeline_info.target_info.has_depth_stencil_target = true;
     pipeline_info.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
-    pipeline_info.depth_stencil_state = (SDL_GPUDepthStencilState){
+    pipeline_info.depth_stencil_state = SDL_GPUDepthStencilState{
         .compare_op = SDL_GPU_COMPAREOP_LESS,
         .write_mask = 0xFF,
         .enable_depth_test = true,
@@ -158,7 +160,7 @@ void Renderer::draw(Camera &camera) {
 
     camera.update();
     for (auto &[key, model]: models) {
-        model->draw(render_pass, sampler, camera, command_buffer);
+        model->draw(render_pass, sampler, camera, command_buffer, point_lights);
     }
 
     SDL_EndGPURenderPass(render_pass);
@@ -170,3 +172,6 @@ void Renderer::add_model(std::string key, std::string model_path, std::string te
     models[key] = new Model(device, model_path, texture_path, normal_path);
 }
 
+void Renderer::add_light(glm::vec3 position, glm::vec3 color, bool billboard) {
+    point_lights.emplace_back(new PointLight{glm::vec4{position, 0.0f}, glm::vec4{color, 1.0f}});
+}

@@ -31,6 +31,12 @@ struct PointLight {
     glm::vec4 color;
 };
 
+struct LightInfo {
+    glm::vec3 position;
+    glm::vec3 color;
+    bool billboard;
+};
+
 struct ModelUniformBuffer {
     glm::mat4 model;
     glm::mat4 view;

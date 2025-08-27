@@ -77,8 +77,8 @@ Model::Model(SDL_GPUDevice *device, std::string model_path, std::string texture_
     upload_buffers_(device);
 }
 
-void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera &camera,
-                 SDL_GPUCommandBuffer *command_buffer) {
+
+void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera, SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights) {
     SDL_GPUBufferBinding vertex_buffer_bindings[1];
     vertex_buffer_bindings[0].buffer = mesh_buffer.vertex_buffer;
     vertex_buffer_bindings[0].offset = 0;
@@ -101,12 +101,14 @@ void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera
         .view = camera.view,
         .projection = camera.projection,
         .view_pos = glm::vec4{camera.pos, 0.0f},
-        .lights = {
-            PointLight{{0.0f, 5.0f, 3.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-            PointLight{{0.0f, 5.0f, -3.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-            //PointLight{{0.0f, 5.0f, 3.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}
-        }
     };
+
+    for (int i = 0; i < lights.size(); i++) {
+        uniform_buffer.lights[i].color = lights[i]->color;
+        uniform_buffer.lights[i].pos = lights[i]->pos;
+    }
+
+
 
     SDL_BindGPUFragmentSamplers(render_pass, 0, texture_sampler_bindings, 2);
     SDL_PushGPUVertexUniformData(command_buffer, 0, &uniform_buffer, sizeof(ModelUniformBuffer));

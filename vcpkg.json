@@ -2,6 +2,7 @@
   "name": "sdl3-engine",
   "version-string": "1.0.0",
   "dependencies": [
+    "assimp",
     "glm",
     {
       "name": "sdl3",
@@ -12,6 +13,6 @@
     "sdl3-image",
     "tinyobjloader",
     "vulkan",
-    "assimp"
+    "imgui"
   ]
 }

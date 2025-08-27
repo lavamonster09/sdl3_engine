@@ -39,13 +39,15 @@ public:
           glm::vec3 axis = {0.0f, 0.0f, 0.0f});
 
     void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera &camera,
-              SDL_GPUCommandBuffer *command_buffer);
+              SDL_GPUCommandBuffer *command_buffer, std::array<PointLight*, 4> &lights);
 
     void update_pos(glm::vec3 pos);
 
     void update_rotation(float angle, glm::vec3 axis);
 
     void update_scale(float scale);
+
+    void draw(SDL_GPURenderPass * render_pass, SDL_GPUSampler * sampler, const Camera & camera, SDL_GPUCommandBuffer * command_buffer, const std::vector<PointLight *> & lights);
 };
 
 
