@@ -11,6 +11,7 @@ struct Vertex {
     float x, y, z;
     float nx, ny, nz;
     float uvx, uvy;
+    float tx, ty, tz;
 };
 
 struct MeshBuffer {
@@ -35,6 +36,7 @@ struct LightInfo {
     glm::vec3 position;
     glm::vec3 color;
     bool billboard;
+    float strength;
 };
 
 struct ModelUniformBuffer {
@@ -52,7 +54,6 @@ struct Texture {
     SDL_GPUTransferBuffer *texture_transfer_buffer;
     SDL_GPUTextureTransferInfo texture_transfer_info;
 };
-
 
 
 #endif //VERTEX_H

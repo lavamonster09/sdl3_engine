@@ -23,7 +23,7 @@ void Renderer::init() {
     vertex_shader = load_shader_from_file(device, "./shaders/vertex.vert.spv",
                                           VERTEX_SHADER, 1);
     fragment_shader = load_shader_from_file(device, "./shaders/fragment.frag.spv",
-                                            FRAGMENT_SHADER, 0, 2);
+                                            FRAGMENT_SHADER, 0, 3);
 
     SDL_GPUGraphicsPipelineCreateInfo pipeline_info{
         .vertex_shader = vertex_shader,
@@ -40,7 +40,7 @@ void Renderer::init() {
     pipeline_info.vertex_input_state.num_vertex_buffers = 1;
     pipeline_info.vertex_input_state.vertex_buffer_descriptions = vertex_buffer_descriptions;
 
-    SDL_GPUVertexAttribute vertex_attributes[3];
+    SDL_GPUVertexAttribute vertex_attributes[4];
 
     // a_position
     vertex_attributes[0].buffer_slot = 0;
@@ -60,7 +60,13 @@ void Renderer::init() {
     vertex_attributes[2].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
     vertex_attributes[2].offset = sizeof(float) * 6;
 
-    pipeline_info.vertex_input_state.num_vertex_attributes = 3;
+    // a_tangents
+    vertex_attributes[3].buffer_slot = 0;
+    vertex_attributes[3].location = 3;
+    vertex_attributes[3].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+    vertex_attributes[3].offset = sizeof(float) * 8;
+
+    pipeline_info.vertex_input_state.num_vertex_attributes = 4;
     pipeline_info.vertex_input_state.vertex_attributes = vertex_attributes;
     SDL_GPUColorTargetDescription color_target_descriptions[1];
     color_target_descriptions[0] = {};
@@ -168,10 +174,11 @@ void Renderer::draw(Camera &camera) {
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-void Renderer::add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path) {
-    models[key] = new Model(device, model_path, texture_path, normal_path);
+void Renderer::add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path,
+                         std::string rough_path) {
+    models[key] = new Model(device, model_path, texture_path, normal_path, rough_path);
 }
 
-void Renderer::add_light(glm::vec3 position, glm::vec3 color, bool billboard) {
-    point_lights.emplace_back(new PointLight{glm::vec4{position, 0.0f}, glm::vec4{color, 1.0f}});
+void Renderer::add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength) {
+    point_lights.emplace_back(new PointLight{glm::vec4{position, 1.0f}, glm::vec4{color, strength}});
 }

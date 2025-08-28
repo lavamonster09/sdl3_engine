@@ -23,18 +23,19 @@ class Renderer {
     ModelUniformBuffer uniform_buffer = {};
     SDL_GPUTexture *depth_texture = nullptr;
     SDL_GPUSampler *sampler;
-    std::vector<PointLight*> point_lights;
+    std::vector<PointLight *> point_lights;
 
 public:
     std::unordered_map<std::string, Model *> models;
-    
+
     void init();
 
     void draw(Camera &camera);
 
-    void add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path);
+    void add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path,
+                   std::string rough_path);
 
-    void add_light(glm::vec3 position, glm::vec3 color, bool billboard);
+    void add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength);
 };
 
 

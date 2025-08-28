@@ -7,47 +7,55 @@
 
 #include <string>
 #include <vector>
+#include <assimp/scene.h>
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
 #include "engine_types.h"
 #include "camera.h"
+#include "Mesh.h"
 
 
 class Model {
-    float rotation_ = 0.0f;
-    glm::vec3 rotation_axis_{1.0f, 0.0f, 0.0f};
-    glm::vec3 pos_{0.0f, 0.0f, 0.0f};
-    float scale_ = 1.0f;
-
-    void upload_buffers_(SDL_GPUDevice *device);
-
 public:
-    MeshBuffer mesh_buffer{};
-    std::vector<Vertex> vertices;
-    std::vector<Uint32> indexes;
-    glm::mat4 model_mat{};
-    Texture texture{};
-    Texture normal_map{};
+    Model(SDL_GPUDevice *device, std::string path, std::string diff_path, std::string norm_path,
+          std::string rough_path) {
+        load_model(device, path);
+        load_textures(device, diff_path, norm_path, rough_path);
+        upload_buffers(device);
+    };
 
+    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera,
+              SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights);
 
-    Model(SDL_GPUDevice *device, std::vector<Vertex> &vertices, std::vector<Uint32> &indexes,
-          glm::vec3 pos = {0.0f, 0.0f, 0.0f}, float rotation = 90.0f, glm::vec3 axis = {0.0f, 0.0f, 0.0f});
-
-    Model(SDL_GPUDevice *device, std::string model_path, std::string texture_path, std::string normal_path, glm::vec3 pos = {0.0f, 0.0f, 0.0f},
-          float rotation = 0.0f,
-          glm::vec3 axis = {0.0f, 0.0f, 0.0f});
-
-    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, Camera &camera,
-              SDL_GPUCommandBuffer *command_buffer, std::array<PointLight*, 4> &lights);
+    void update_scale(float scale);
 
     void update_pos(glm::vec3 pos);
 
     void update_rotation(float angle, glm::vec3 axis);
 
-    void update_scale(float scale);
+private:
+    float rotation = 0.0f;
+    glm::vec3 rotation_axis{1.0f, 0.0f, 0.0f};
+    glm::vec3 pos{0.0f, 0.0f, 0.0f};
+    float scale = 1.0f;
+    std::vector<Mesh> meshes;
+    glm::mat4 model_mat;
+    Texture texture_diff;
+    Texture texture_norm;
+    Texture texture_rough;
 
-    void draw(SDL_GPURenderPass * render_pass, SDL_GPUSampler * sampler, const Camera & camera, SDL_GPUCommandBuffer * command_buffer, const std::vector<PointLight *> & lights);
+    void upload_buffers(SDL_GPUDevice *device);
+
+    void load_model(SDL_GPUDevice *device, std::string path);
+
+    void process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene);
+
+    Mesh process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene);
+
+    void load_textures(SDL_GPUDevice *device, std::string diff_path, std::string norm_path, std::string rough_path);
+
+    void upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture texture);
 };
 
 

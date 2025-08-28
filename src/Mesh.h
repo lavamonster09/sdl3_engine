@@ -15,17 +15,14 @@ class Mesh {
 public:
     std::vector<Vertex> vertices;
     std::vector<Uint32> indices;
-    Texture texture;
-    Texture ntexture;
 
-    Mesh(SDL_GPUDevice *device, std::vector<Vertex> vertices, std::vector<Uint32> indices, Texture texture, Texture ntexture);
+    Mesh(SDL_GPUDevice *device, std::vector<Vertex> vertices, std::vector<Uint32> indices);
     void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera, SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights, glm::mat4 model_mat);
-
+    void upload_mesh(SDL_GPUCommandBuffer *command_buffer, SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device);
 private:
     MeshBuffer mesh_buffer;
 
     void setup_mesh(SDL_GPUDevice *device);
-    void upload_mesh(SDL_GPUDevice *device);
 };
 
 
