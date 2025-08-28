@@ -4,23 +4,20 @@
 
 #ifndef ENGINE_H
 #define ENGINE_H
-#include <SDL3/SDL_video.h>
 
 #include "CameraController.h"
 #include "InputManager.h"
-#include "Renderer.h"
-
-class CameraController;
+#include "renderlib/renderlib.h"
 
 class Engine {
     bool should_quit = false;
     Uint64 last_frame = 0.0;
     Uint64 current_frame = SDL_GetPerformanceCounter();
-    Renderer renderer{};
-    InputManager input_manager{};
-    CameraController *camera_controller{};
+    InputManager *input_manager = nullptr;
+    CameraController *camera_controller = nullptr;
 
 public:
+    Renderer *renderer = nullptr;
     double delta_time = 0.0;
 
     void init();

@@ -7,8 +7,8 @@
 #include <vector>
 #include <SDL3/SDL_gpu.h>
 
-#include "camera.h"
-#include "engine_types.h"
+#include "Camera.h"
+#include "../engine_types.h"
 
 
 class Mesh {
@@ -17,8 +17,8 @@ public:
     std::vector<Uint32> indices;
 
     Mesh(SDL_GPUDevice *device, std::vector<Vertex> vertices, std::vector<Uint32> indices);
-    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera, SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights, glm::mat4 model_mat);
-    void upload_mesh(SDL_GPUCommandBuffer *command_buffer, SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device);
+    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera, SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights, glm::mat4 model_mat) const;
+    void upload_mesh(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device) const;
 private:
     MeshBuffer mesh_buffer;
 

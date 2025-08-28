@@ -11,8 +11,8 @@
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
-#include "engine_types.h"
-#include "camera.h"
+#include "../engine_types.h"
+#include "Camera.h"
 #include "Mesh.h"
 
 
@@ -25,7 +25,7 @@ public:
         upload_buffers(device);
     };
 
-    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera,
+    void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera,
               SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights);
 
     void update_scale(float scale);

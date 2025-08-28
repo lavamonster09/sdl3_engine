@@ -4,17 +4,25 @@
 
 #ifndef RENDERER_H
 #define RENDERER_H
-#include <array>
+
 #include <unordered_map>
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
 
 #include "Camera.h"
-#include "engine_types.h"
+#include "../engine_types.h"
 #include "Model.h"
-
 class Renderer {
+public:
+    std::unordered_map<std::string, Model *> models;
+
+    void init();
+    void draw(Camera *camera);
+    void add_model(ModelCreateInfo *info);
+    void add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength);
+    void add_models(std::vector<ModelCreateInfo> &infos);
+private:
     SDL_Window *window = nullptr;
     SDL_GPUDevice *device = nullptr;
     SDL_GPUShader *vertex_shader = nullptr;
@@ -24,18 +32,6 @@ class Renderer {
     SDL_GPUTexture *depth_texture = nullptr;
     SDL_GPUSampler *sampler;
     std::vector<PointLight *> point_lights;
-
-public:
-    std::unordered_map<std::string, Model *> models;
-
-    void init();
-
-    void draw(Camera &camera);
-
-    void add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path,
-                   std::string rough_path);
-
-    void add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength);
 };
 
 

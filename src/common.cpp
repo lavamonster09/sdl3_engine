@@ -2,17 +2,12 @@
 // Created by oliver on 05/08/2025.
 //
 #include "common.h"
-#include <cmath>
 #include <stdexcept>
-#include <tiny_obj_loader.h>
 #include <vector>
 #include <iostream>
 
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
 
-#include "Model.h"
+#include "renderlib/Model.h"
 
 
 SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage) {
@@ -82,49 +77,6 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, Sh
     SDL_GPUShader *shader = SDL_CreateGPUShader(device, &shader_info);
     SDL_free(shader_code);
     return shader;
-}
-
-std::tuple<MeshBuffer, std::vector<Vertex>, std::vector<Uint32> > create_mesh_buffer_from_path(
-    SDL_GPUDevice *device, std::string path) {
-    std::vector<Vertex> vertices;
-    std::vector<Uint32> indexes;
-
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string error;
-    std::string warn;
-
-    Assimp::Importer importer;
-
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &error, path.c_str())) {
-        throw std::runtime_error(error);
-    }
-
-    const aiScene* scene = importer.ReadFile( path.c_str(),
-    aiProcess_CalcTangentSpace       |
-    aiProcess_Triangulate            |
-    aiProcess_FlipUVs);
-
-    for (const auto &shape: shapes) {
-        for (const auto &index: shape.mesh.indices) {
-            Vertex vertex{
-                attrib.vertices[3 * index.vertex_index + 0],
-                attrib.vertices[3 * index.vertex_index + 1],
-                attrib.vertices[3 * index.vertex_index + 2],
-                attrib.normals[3 * index.normal_index + 0],
-                attrib.normals[3 * index.normal_index + 1],
-                attrib.normals[3 * index.normal_index + 2],
-                attrib.texcoords[2 * index.texcoord_index + 0],
-                1 - attrib.texcoords[2 * index.texcoord_index + 1]
-            };
-            vertices.push_back(vertex);
-
-            indexes.push_back(indexes.size());
-        }
-    }
-
-    return {create_mesh_buffer(device, vertices, indexes), vertices, indexes};
 }
 
 Texture create_texture_image(

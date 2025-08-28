@@ -3,33 +3,17 @@
 //
 
 #include "Engine.h"
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlgpu3.h>
 
 #include <iostream>
 
 void Engine::init() {
     camera_controller = new CameraController();
-    renderer.init();
-    renderer.add_model(
-        "car",
-        "../assets/Socrates.obj",
-        "../assets/1001_Base_Color.bmp",
-        "../assets/1001_Normal_OpenGL.bmp",
-        "../assets/1001_Roughness.bmp"
-    );
-    renderer.models["car"]->update_scale(0.05f);
-    renderer.add_model("floor", "../assets/Floor.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp",
-                       "../assets/ground_rough.bmp");
-    renderer.models["floor"]->update_scale(2.0f);
-    renderer.add_model("sphere", "../assets/Sphere.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp",
-                       "../assets/ground_rough.bmp");
-    renderer.models["sphere"]->update_pos({0.0f, 5.0f, 3.0f});
-    renderer.add_model("sphere2", "../assets/Sphere.obj", "../assets/ground_diff.bmp", "../assets/ground_norm.bmp",
-                       "../assets/ground_rough.bmp");
-    renderer.models["sphere2"]->update_pos({0.0f, 5.0f, -3.0f});
-    renderer.add_light({0.0f, 5.0f, -3.0f}, {1.0f, 0.0f, 0.0f}, true, 1.0f);
-    renderer.add_light({0.0f, 5.0f, 3.0f}, {0.0f, 1.0f, 0.0f}, true, 1.0f);
-    renderer.add_light({3.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, true, 1.0f);
-    renderer.add_light({3.0f, 40.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, true, 30.0f);
+    renderer = new Renderer();
+    input_manager = new InputManager();
+    renderer->init();
 }
 
 void Engine::game_loop() {
@@ -38,8 +22,9 @@ void Engine::game_loop() {
         current_frame = SDL_GetPerformanceCounter();
         delta_time = (double) ((current_frame - last_frame) / (double) SDL_GetPerformanceFrequency());
         events();
-        camera_controller->input(this, input_manager);
-        renderer.draw(camera_controller->camera);
+        camera_controller->input(input_manager);
+        camera_controller->update();
+        renderer->draw(camera_controller);
     }
 }
 
@@ -49,6 +34,6 @@ void Engine::events() {
         if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
             should_quit = true;
         }
-        input_manager.handle_event(&event);
+        input_manager->handle_event(&event);
     }
 }

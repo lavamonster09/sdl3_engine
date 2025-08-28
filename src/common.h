@@ -4,7 +4,7 @@
 
 #ifndef COMMON_H
 #define COMMON_H
-#include <array>
+
 #include <string>
 #include <vector>
 #include <SDL3/SDL.h>

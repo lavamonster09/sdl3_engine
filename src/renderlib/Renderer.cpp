@@ -3,14 +3,14 @@
 //
 
 #include "Renderer.h"
-#include "common.h"
+#include "../common.h"
 #include "glm/glm.hpp"
 #include <array>
 #include <iostream>
 #include <ostream>
 #include <utility>
 
-#include "engine_types.h"
+#include "../engine_types.h"
 #include "Model.h"
 
 void Renderer::init() {
@@ -119,7 +119,7 @@ void Renderer::init() {
     SDL_ReleaseGPUShader(device, fragment_shader);
 }
 
-void Renderer::draw(Camera &camera) {
+void Renderer::draw(Camera *camera) {
     SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
 
     SDL_GPUTexture *swapchain_texture;
@@ -164,7 +164,6 @@ void Renderer::draw(Camera &camera) {
 
     SDL_BindGPUGraphicsPipeline(render_pass, graphics_pipeline);
 
-    camera.update();
     for (auto &[key, model]: models) {
         model->draw(render_pass, sampler, camera, command_buffer, point_lights);
     }
@@ -174,9 +173,14 @@ void Renderer::draw(Camera &camera) {
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
 
-void Renderer::add_model(std::string key, std::string model_path, std::string texture_path, std::string normal_path,
-                         std::string rough_path) {
-    models[key] = new Model(device, model_path, texture_path, normal_path, rough_path);
+void Renderer::add_model(ModelCreateInfo *info) {
+    models[info->key] = new Model(device, info->model_path, info->texture_path, info->normal_path, info->rough_path);
+}
+
+void Renderer::add_models(std::vector<ModelCreateInfo> &infos) {
+    for (auto &info: infos) {
+        add_model(&info);
+    }
 }
 
 void Renderer::add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength) {

@@ -12,7 +12,7 @@
 #include <assimp/postprocess.h>
 
 #include "Camera.h"
-#include "common.h"
+#include "../common.h"
 
 
 void Model::update_pos(glm::vec3 pos) {
@@ -43,7 +43,7 @@ void Model::update_scale(float scale) {
     model_mat = trans;
 }
 
-void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera &camera,SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights) {
+void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera,SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights) {
     SDL_GPUTextureSamplerBinding texture_sampler_bindings[3];
     texture_sampler_bindings[0].texture = texture_diff.texture;
     texture_sampler_bindings[0].sampler = sampler;
@@ -135,7 +135,7 @@ void Model::upload_buffers(SDL_GPUDevice *device) {
     SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
     SDL_GPUCopyPass *copy_pass = SDL_BeginGPUCopyPass(command_buffer);
     for (unsigned int i = 0; i < meshes.size(); i++) {
-        meshes[i].upload_mesh(command_buffer, copy_pass, device);
+        meshes[i].upload_mesh(copy_pass, device);
     }
     upload_texture(copy_pass, device, texture_diff);
     upload_texture(copy_pass, device, texture_norm);
@@ -144,4 +144,3 @@ void Model::upload_buffers(SDL_GPUDevice *device) {
     SDL_EndGPUCopyPass(copy_pass);
     SDL_SubmitGPUCommandBuffer(command_buffer);
 }
-

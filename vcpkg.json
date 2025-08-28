@@ -5,6 +5,13 @@
     "assimp",
     "glm",
     {
+      "name": "imgui",
+      "features": [
+        "sdlgpu3-binding",
+        "sdl3-binding"
+      ]
+    },
+    {
       "name": "sdl3",
       "features": [
         "vulkan"
@@ -12,7 +19,6 @@
     },
     "sdl3-image",
     "tinyobjloader",
-    "vulkan",
-    "imgui"
+    "vulkan"
   ]
 }

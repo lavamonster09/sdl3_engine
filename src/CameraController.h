@@ -4,21 +4,18 @@
 
 #ifndef CAMERACONTROLLER_H
 #define CAMERACONTROLLER_H
-#include "Camera.h"
+#include "renderlib/Camera.h"
 #include "InputManager.h"
-#include "Engine.h"
 
 class Engine;
 
-class CameraController {
+class CameraController: public Camera{
 public:
-    Camera camera;
+    float speed = 0.05f;
 
-    CameraController() {
-        camera = Camera();
-    }
+    CameraController();
 
-    void input(Engine *engine, InputManager &input_manager);
+    void input(InputManager *input_manager);
 };
 
 

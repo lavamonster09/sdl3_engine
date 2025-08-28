@@ -6,6 +6,7 @@
 #define VERTEX_H\
 
 #include <glm/glm.hpp>
+#include <string>
 
 struct Vertex {
     float x, y, z;
@@ -53,6 +54,14 @@ struct Texture {
     SDL_GPUTexture *texture;
     SDL_GPUTransferBuffer *texture_transfer_buffer;
     SDL_GPUTextureTransferInfo texture_transfer_info;
+};
+
+struct ModelCreateInfo {
+    std::string key;
+    std::string model_path;
+    std::string texture_path;
+    std::string normal_path;
+    std::string rough_path;
 };
 
 
