@@ -35,7 +35,7 @@ vec3 calculate_point_light(pointLight point_light) {
     vec3 specular = point_light.color.rgb * spec;
     float distance = length(point_light.position - fs_in.frag_pos);
 
-    return ((vec3(0.1f, 0.1f, 0.1f) + diffuse + specular) * (1 / distance) * point_light.strength);
+    return ((vec3(0.1f, 0.1f, 0.1f) + diffuse + specular) * (1 / (distance * distance)) * point_light.strength);
 }
 
 void main() {
@@ -46,6 +46,15 @@ void main() {
     for (int i = 0; i < 4; i++) {
         result += calculate_point_light(fs_in.point_lights[i]);
     }
-    FragColor = vec4(result * t.rgb, 1.0);
+    if (t.a != 0) {
+        float gamma = 2.7;
+        FragColor = pow(vec4(result * t.rgb, 1.0f), vec4(1.0 / gamma));;
+    }
+    else {
+        discard;
+    }
+
+    //FragColor = vec4(t.rgb, 1.0);
+    //FragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f);
 }
 

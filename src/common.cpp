@@ -5,10 +5,11 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "renderlib/Model.h"
-
 
 SDL_GPUBuffer *create_buffer(SDL_GPUDevice *device, Uint32 size, SDL_GPUBufferUsageFlags usage) {
     SDL_GPUBufferCreateInfo buffer_info{
@@ -81,7 +82,8 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, Sh
 
 Texture create_texture_image(
     SDL_GPUDevice *device, const std::string &path) {
-    SDL_Surface *image_data = LoadImage(path.c_str(), 4);
+    std::string p = "../assets/" + path;
+    SDL_Surface *image_data = LoadImage(p.c_str(), 4);
 
     SDL_GPUTextureCreateInfo texture_create_info{};
     texture_create_info.type = SDL_GPU_TEXTURETYPE_2D;
@@ -109,7 +111,7 @@ Texture create_texture_image(
     SDL_memcpy(transfer_ptr, image_data->pixels, image_data->w * image_data->h * 4);
     SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
 
-     SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
+    SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
 
     return Texture{image_data, texture, transfer_buffer, texture_transfer_info};
 }
@@ -119,9 +121,9 @@ SDL_Surface *LoadImage(const char *path, int desiredChannels) {
     SDL_Surface *result;
     SDL_PixelFormat format;
 
-    result = SDL_LoadBMP(path);
+    result = IMG_Load(path);
     if (result == NULL) {
-        SDL_Log("Failed to load BMP: %s", SDL_GetError());
+        SDL_Log("Failed to load IMAGE: %s path:%s", SDL_GetError(), path);
         return NULL;
     }
 

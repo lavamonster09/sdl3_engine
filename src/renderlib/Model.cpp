@@ -43,15 +43,8 @@ void Model::update_scale(float scale) {
     model_mat = trans;
 }
 
-void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera,SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights) {
-    SDL_GPUTextureSamplerBinding texture_sampler_bindings[3];
-    texture_sampler_bindings[0].texture = texture_diff.texture;
-    texture_sampler_bindings[0].sampler = sampler;
-    texture_sampler_bindings[1].texture = texture_norm.texture;
-    texture_sampler_bindings[1].sampler = sampler;
-    texture_sampler_bindings[2].texture = texture_rough.texture;
-    texture_sampler_bindings[2].sampler = sampler;
-    SDL_BindGPUFragmentSamplers(render_pass, 0, texture_sampler_bindings, 3);
+void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera,
+                 SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights) {
     for (int i = 0; i < meshes.size(); i++) {
         meshes[i].draw(render_pass, sampler, camera, command_buffer, lights, model_mat);
     }
@@ -59,10 +52,10 @@ void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const 
 
 void Model::load_model(SDL_GPUDevice *device, std::string path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene *scene = importer.ReadFile(
+        path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
-    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
         return;
     }
@@ -80,9 +73,14 @@ void Model::process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *sc
 Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<Uint32> indices;
+    Texture texture_diff = create_texture_image(device, "textures/texture.bmp");
+    Texture texture_rough = create_texture_image(device, "textures/rough_null.png");
+    Texture texture_normal = create_texture_image(device, "textures/normal_null.png");
+
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
         Vertex vertex;
+
         vertex.x = mesh->mVertices[i].x;
         vertex.y = mesh->mVertices[i].y;
         vertex.z = mesh->mVertices[i].z;
@@ -95,8 +93,7 @@ Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *sce
         if (mesh->mTextureCoords[0]) {
             vertex.uvx = mesh->mTextureCoords[0][i].x;
             vertex.uvy = mesh->mTextureCoords[0][i].y;
-        }
-        else {
+        } else {
             vertex.uvx = 0;
             vertex.uvy = 0;
         }
@@ -109,14 +106,26 @@ Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *sce
             indices.push_back(face.mIndices[j]);
         }
     }
+    if (mesh->mMaterialIndex >= 0) {
+        aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+            aiString str;
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+            texture_diff = create_texture_image(device, str.C_Str());
+        }
+        if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
+            aiString str;
+            material->GetTexture(aiTextureType_NORMALS, 0, &str);
+            texture_normal = create_texture_image(device, str.C_Str());
+        }
+        if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+            aiString str;
+            material->GetTexture(aiTextureType_SPECULAR, 0, &str);
+            texture_rough = create_texture_image(device, str.C_Str());
+        }
+    }
 
-    return Mesh(device, vertices, indices);
-}
-
-void Model::load_textures(SDL_GPUDevice *device, std::string diff_path, std::string norm_path, std::string rough_path) {
-    texture_diff = create_texture_image(device, diff_path);
-    texture_norm = create_texture_image(device, norm_path);
-    texture_rough = create_texture_image(device, rough_path);
+    return Mesh(device, vertices, indices, {texture_diff, texture_normal, texture_rough});
 }
 
 void Model::upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture texture) {
@@ -127,7 +136,6 @@ void Model::upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Te
     texture_buffer_region.d = 1;
 
     SDL_UploadToGPUTexture(copy_pass, &texture.texture_transfer_info, &texture_buffer_region, false);
-    SDL_DestroySurface(texture.image_data);
     SDL_ReleaseGPUTransferBuffer(device, texture.texture_transfer_buffer);
 }
 
@@ -137,9 +145,6 @@ void Model::upload_buffers(SDL_GPUDevice *device) {
     for (unsigned int i = 0; i < meshes.size(); i++) {
         meshes[i].upload_mesh(copy_pass, device);
     }
-    upload_texture(copy_pass, device, texture_diff);
-    upload_texture(copy_pass, device, texture_norm);
-    upload_texture(copy_pass, device, texture_rough);
 
     SDL_EndGPUCopyPass(copy_pass);
     SDL_SubmitGPUCommandBuffer(command_buffer);

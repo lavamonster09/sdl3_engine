@@ -7,8 +7,8 @@
     {
       "name": "imgui",
       "features": [
-        "sdlgpu3-binding",
-        "sdl3-binding"
+        "sdl3-binding",
+        "sdlgpu3-binding"
       ]
     },
     {
@@ -17,8 +17,15 @@
         "vulkan"
       ]
     },
-    "sdl3-image",
+    {
+      "name": "sdl3-image",
+      "features": [
+        "png",
+        "jpeg"
+      ]
+    },
     "tinyobjloader",
-    "vulkan"
+    "vulkan",
+    "stb"
   ]
 }

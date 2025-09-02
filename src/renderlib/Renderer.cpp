@@ -108,9 +108,9 @@ void Renderer::init() {
         .min_filter = SDL_GPU_FILTER_NEAREST,
         .mag_filter = SDL_GPU_FILTER_NEAREST,
         .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
-        .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-        .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
-        .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE,
+        .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+        .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
+        .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
     };
 
     sampler = SDL_CreateGPUSampler(device, &sampler_create_info);
@@ -121,7 +121,6 @@ void Renderer::init() {
 
 void Renderer::draw(Camera *camera) {
     SDL_GPUCommandBuffer *command_buffer = SDL_AcquireGPUCommandBuffer(device);
-
     SDL_GPUTexture *swapchain_texture;
     Uint32 width, height;
     SDL_WaitAndAcquireGPUSwapchainTexture(
@@ -174,7 +173,7 @@ void Renderer::draw(Camera *camera) {
 }
 
 void Renderer::add_model(ModelCreateInfo *info) {
-    models[info->key] = new Model(device, info->model_path, info->texture_path, info->normal_path, info->rough_path);
+    models[info->key] = new Model(device, info->model_path);
 }
 
 void Renderer::add_models(std::vector<ModelCreateInfo> &infos) {

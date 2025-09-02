@@ -59,9 +59,12 @@ struct Texture {
 struct ModelCreateInfo {
     std::string key;
     std::string model_path;
-    std::string texture_path;
-    std::string normal_path;
-    std::string rough_path;
+};
+
+struct Material {
+    Texture texture_diff;
+    Texture texture_norm;
+    Texture texture_rough;
 };
 
 

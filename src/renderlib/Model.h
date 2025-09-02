@@ -18,10 +18,8 @@
 
 class Model {
 public:
-    Model(SDL_GPUDevice *device, std::string path, std::string diff_path, std::string norm_path,
-          std::string rough_path) {
+    Model(SDL_GPUDevice *device, std::string path) {
         load_model(device, path);
-        load_textures(device, diff_path, norm_path, rough_path);
         upload_buffers(device);
     };
 
@@ -41,9 +39,6 @@ private:
     float scale = 1.0f;
     std::vector<Mesh> meshes;
     glm::mat4 model_mat;
-    Texture texture_diff;
-    Texture texture_norm;
-    Texture texture_rough;
 
     void upload_buffers(SDL_GPUDevice *device);
 
@@ -52,8 +47,6 @@ private:
     void process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene);
 
     Mesh process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene);
-
-    void load_textures(SDL_GPUDevice *device, std::string diff_path, std::string norm_path, std::string rough_path);
 
     void upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture texture);
 };
