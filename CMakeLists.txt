@@ -12,7 +12,6 @@ find_package(imgui CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
 include_directories(src/renderlib)
-add_subdirectory(src/renderlib)
 
 add_executable(sdl3_engine src/main.cpp
         src/engine_types.h
@@ -24,6 +23,20 @@ add_executable(sdl3_engine src/main.cpp
         src/Engine.h
         src/CameraController.cpp
         src/CameraController.h
+        src/ECS.h
+        src/components.h
+        src/Renderer3DSystem.cpp
+        src/Renderer3DSystem.h
+        src/AssetManager.cpp
+        src/AssetManager.h
+        src/renderlib/Camera.cpp
+        src/renderlib/Camera.h
+        src/renderlib/Mesh.cpp
+        src/renderlib/Mesh.h
+        src/renderlib/Model.h
+        src/renderlib/Model.cpp
+        src/renderlib/Renderer.cpp
+        src/renderlib/Renderer.h
 )
 
 function(add_shaders TARGET_NAME)
@@ -54,7 +67,6 @@ file(GLOB SHADER_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/shaders/*")
 add_shaders(Shaders ${SHADER_SOURCES})
 add_dependencies(sdl3_engine Shaders)
 
-target_link_libraries(sdl3_engine PRIVATE renderlib)
 target_link_libraries(sdl3_engine PRIVATE SDL3::SDL3)
 target_link_libraries(sdl3_engine PRIVATE tinyobjloader::tinyobjloader)
 target_link_libraries(sdl3_engine PRIVATE glm::glm)

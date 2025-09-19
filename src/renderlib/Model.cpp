@@ -37,9 +37,9 @@ void Model::update_rotation(float angle, glm::vec3 axis) {
 void Model::update_scale(float scale) {
     this->scale = scale;
     glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::scale(trans, glm::vec3(scale, scale, scale));
     trans = glm::translate(trans, pos);
     trans = glm::rotate(trans, rotation, rotation_axis);
-    trans = glm::scale(trans, glm::vec3(scale, scale, scale));
     model_mat = trans;
 }
 

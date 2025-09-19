@@ -5,6 +5,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <queue>
 #include <unordered_map>
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL.h>
@@ -13,17 +14,22 @@
 #include "Camera.h"
 #include "../engine_types.h"
 #include "Model.h"
+
 class Renderer {
 public:
-    std::unordered_map<std::string, Model *> models;
+    std::queue<Model *> draw_queue;
+    SDL_Window *window = nullptr;
 
     void init();
+
     void draw(Camera *camera);
-    void add_model(ModelCreateInfo *info);
+
+    Model *add_model(std::string &model_path);
+
     void add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength);
-    void add_models(std::vector<ModelCreateInfo> &infos);
+
 private:
-    SDL_Window *window = nullptr;
+    glm::vec4 clear_color;
     SDL_GPUDevice *device = nullptr;
     SDL_GPUShader *vertex_shader = nullptr;
     SDL_GPUShader *fragment_shader = nullptr;

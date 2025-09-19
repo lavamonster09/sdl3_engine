@@ -3,32 +3,42 @@
 //
 
 #include "Engine.h"
+#include "ECS.h"
+#include "Renderer3DSystem.h"
 
-Engine engine{};
+Engine g_engine{};
+extern ECS::Coordinator g_coordinator;
 
 int main() {
-    engine.init();
-    std::vector<ModelCreateInfo> info;
-    info.push_back({
-        "car", "../assets/socrates.gltf"
-    });
-    info.push_back({
-        "floor", "../assets/scene.gltf"
-    });
-    info.push_back({
-        "light", "../assets/Sphere.obj"
-    });
-    engine.renderer->add_models(info);
-    engine.renderer->models["car"]->update_scale(0.05f);
-    engine.renderer->models["car"]->update_rotation(glm::radians(-90.0f), glm::vec3{1.0f, 0.0f, 0.0f});
-    engine.renderer->models["floor"]->update_scale(0.05f);
-    engine.renderer->models["floor"]->update_rotation(glm::radians(180.0f), glm::vec3{0.0f, 0.0f, 1.0f});
-    engine.renderer->models["light"]->update_pos({0.0f, 5.0f, -3.0f});
-    engine.renderer->add_light({0.0f, 5.0f, -3.0f}, {1.0f, 0.0f, 0.0f}, true, 1.0f);
-    engine.renderer->add_light({0.0f, 5.0f, 3.0f}, {0.0f, 1.0f, 0.0f}, true, 1.0f);
-    engine.renderer->add_light({3.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, true, 1.0f);
-    engine.renderer->add_light({1000.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, true, 300090.0f);
-    engine.game_loop();
+    g_engine.init();
+
+    g_engine.add_entity("socrates");
+    g_engine.add_component("socrates", Transform3D{
+                               {0.0f, 0.0f, -0.0f},
+                               {1.0f, 0.0f, 0.0f},
+                               glm::radians(-90.0f),
+                               0.05f
+                           });
+    g_engine.add_component("socrates", Mesh3D{
+                               "../assets/socrates.gltf",
+                           });
+
+    g_engine.add_entity("map");
+    g_engine.add_component("map", Transform3D{
+                               {0.0f, 0.0f, -0.0f},
+                               {0.0f, 0.0f, 1.0f},
+                               glm::radians(180.0f),
+                               0.05f
+                           });
+    g_engine.add_component("map", Mesh3D{
+                               "../assets/scene.gltf"
+                           });
+
+    g_engine.renderer->add_light({0.0f, 5.0f, -3.0f}, {1.0f, 0.0f, 0.0f}, true, 1.0f);
+    //engine.renderer->add_light({0.0f, 5.0f, 3.0f}, {0.0f, 1.0f, 0.0f}, true, 1.0f);
+    //engine.renderer->add_light({3.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, true, 1.0f);
+    //engine.renderer->add_light({1000.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, true, 300090.0f);
+    g_engine.game_loop();
     return 0;
 }
 

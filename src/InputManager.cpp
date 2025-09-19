@@ -8,10 +8,11 @@
 
 void InputManager::handle_event(SDL_Event *e) {
         if (e->type == SDL_EVENT_KEY_DOWN) {
-                //std::cout << "KEY DOWN " << e->key.key << std::endl;
                 if (e->key.key < 127) {
+                        key_just_pressed[e->key.key] = true;
                         key_down[e->key.key] = true;
                 } else {
+                        key_just_pressed[e->key.key - 1073741753] = true;
                         key_down[e->key.key - 1073741753] = true;
                 }
         }
