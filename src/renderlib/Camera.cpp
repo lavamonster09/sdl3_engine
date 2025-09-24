@@ -17,9 +17,12 @@ void Camera::update() {
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    //direction = glm::normalize(-pos);
     front = glm::normalize(direction);
     view = glm::lookAt(pos, pos + front, up);
+    //view = glm::lookAt(pos, glm::vec3{0.0f}, up);
     projection = glm::perspective(glm::radians(fov), 16.0f / 9.0f, 0.1f, 100.0f);
+    //projection = glm::ortho(-160.0f, +160.0f, -90.0f, +90.0f, 0.1f, 100.0f);
 }
 
 void Camera::init() {

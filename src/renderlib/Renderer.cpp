@@ -16,10 +16,11 @@
 
 #include "../engine_types.h"
 #include "Model.h"
-#include "../AssetManager.h"
+#include "AssetManager.h"
 #include "../Engine.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
+#include "AssetManager.h"
 
 extern Engine g_engine;
 extern ECS::Coordinator g_coordinator;
@@ -115,9 +116,9 @@ void Renderer::init() {
     graphics_pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
 
     SDL_GPUSamplerCreateInfo sampler_create_info{
-        .min_filter = SDL_GPU_FILTER_NEAREST,
-        .mag_filter = SDL_GPU_FILTER_NEAREST,
-        .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST,
+        .min_filter = SDL_GPU_FILTER_LINEAR,
+        .mag_filter = SDL_GPU_FILTER_LINEAR,
+        .mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR,
         .address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
         .address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
         .address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT,
@@ -174,7 +175,7 @@ void Renderer::draw(Camera *camera) {
                 g_coordinator.get_component<Transform3D>(entity.second).position.y,
                 g_coordinator.get_component<Transform3D>(entity.second).position.z
             };
-            ImGui::InputFloat3(entity.first.c_str(), pos);
+            ImGui::DragFloat3(entity.first.c_str(), pos);
             g_coordinator.get_component<Transform3D>(entity.second).position.x = pos[0];
             g_coordinator.get_component<Transform3D>(entity.second).position.y = pos[1];
             g_coordinator.get_component<Transform3D>(entity.second).position.z = pos[2];
@@ -242,7 +243,7 @@ void Renderer::draw(Camera *camera) {
 
 
 Model *Renderer::add_model(std::string &model_path) {
-    Model *model = new Model(device, model_path);
+    Model *model = new Model(device, model_path, asset_manager);
     return model;
 }
 

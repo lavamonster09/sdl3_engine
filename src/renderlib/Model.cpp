@@ -5,6 +5,7 @@
 #include "Model.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
+#include <AssetManager.h>
 #include <iostream>
 #include <tiny_obj_loader.h>
 #include <assimp/Importer.hpp>
@@ -50,7 +51,7 @@ void Model::draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const 
     }
 }
 
-void Model::load_model(SDL_GPUDevice *device, std::string path) {
+void Model::load_model(SDL_GPUDevice *device, std::string path, AssetManager &asset_manager) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(
         path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -60,22 +61,22 @@ void Model::load_model(SDL_GPUDevice *device, std::string path) {
         return;
     }
 
-    process_model(device, scene->mRootNode, scene);
+    process_model(device, scene->mRootNode, scene, asset_manager);
 }
 
-void Model::process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene) {
+void Model::process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene, AssetManager &asset_manager) {
     for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[i];
-        meshes.push_back(process_mesh(device, mesh, scene));
+        meshes.push_back(process_mesh(device, mesh, scene, asset_manager));
     }
 }
 
-Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene) {
+Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene, AssetManager &asset_manager) {
     std::vector<Vertex> vertices;
     std::vector<Uint32> indices;
-    Texture texture_diff = create_texture_image(device, "textures/texture.bmp");
-    Texture texture_rough = create_texture_image(device, "textures/rough_null.png");
-    Texture texture_normal = create_texture_image(device, "textures/normal_null.png");
+    Texture *texture_diff = asset_manager.add_texture(device, "texture.bmp");
+    Texture *texture_rough = asset_manager.add_texture(device, "rough_null.png");
+    Texture *texture_normal = asset_manager.add_texture(device, "normal_null.png");
 
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -111,32 +112,21 @@ Mesh Model::process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *sce
         if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
             aiString str;
             material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
-            texture_diff = create_texture_image(device, str.C_Str());
+            texture_diff = asset_manager.add_texture(device, str.C_Str());
         }
         if (material->GetTextureCount(aiTextureType_NORMALS) > 0) {
             aiString str;
             material->GetTexture(aiTextureType_NORMALS, 0, &str);
-            texture_normal = create_texture_image(device, str.C_Str());
+            texture_normal = asset_manager.add_texture(device, str.C_Str());
         }
         if (material->GetTextureCount(aiTextureType_SPECULAR) > 0) {
             aiString str;
             material->GetTexture(aiTextureType_SPECULAR, 0, &str);
-            texture_rough = create_texture_image(device, str.C_Str());
+            texture_rough = asset_manager.add_texture(device, str.C_Str());
         }
     }
 
     return Mesh(device, vertices, indices, {texture_diff, texture_normal, texture_rough});
-}
-
-void Model::upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture texture) {
-    SDL_GPUTextureRegion texture_buffer_region{};
-    texture_buffer_region.texture = texture.texture;
-    texture_buffer_region.w = texture.image_data->w;
-    texture_buffer_region.h = texture.image_data->h;
-    texture_buffer_region.d = 1;
-
-    SDL_UploadToGPUTexture(copy_pass, &texture.texture_transfer_info, &texture_buffer_region, false);
-    SDL_ReleaseGPUTransferBuffer(device, texture.texture_transfer_buffer);
 }
 
 void Model::upload_buffers(SDL_GPUDevice *device) {

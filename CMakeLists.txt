@@ -27,8 +27,8 @@ add_executable(sdl3_engine src/main.cpp
         src/components.h
         src/Renderer3DSystem.cpp
         src/Renderer3DSystem.h
-        src/AssetManager.cpp
-        src/AssetManager.h
+        src/renderlib/AssetManager.cpp
+        src/renderlib/AssetManager.h
         src/renderlib/Camera.cpp
         src/renderlib/Camera.h
         src/renderlib/Mesh.cpp
