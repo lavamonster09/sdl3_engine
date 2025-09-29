@@ -5,7 +5,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <AssetManager.h>
 #include <string>
 #include <vector>
 #include <assimp/scene.h>
@@ -15,7 +14,7 @@
 #include "../engine_types.h"
 #include "Camera.h"
 #include "Mesh.h"
-
+#include "AssetManager.h"
 
 class Model {
 public:
