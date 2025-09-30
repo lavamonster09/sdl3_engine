@@ -5,7 +5,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <AssetManager.h>
 #include <string>
 #include <vector>
 #include <assimp/scene.h>
@@ -19,8 +18,8 @@
 
 class Model {
 public:
-    Model(SDL_GPUDevice *device, std::string path, AssetManager &asset_manager) {
-        load_model(device, path, asset_manager);
+    Model(SDL_GPUDevice *device, std::string path) {
+        load_model(device, path);
         upload_buffers(device);
     };
 
@@ -43,11 +42,13 @@ private:
 
     void upload_buffers(SDL_GPUDevice *device);
 
-    void load_model(SDL_GPUDevice *device, std::string path, AssetManager &asset_manager);
+    void load_model(SDL_GPUDevice *device, std::string path);
 
-    void process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene, AssetManager &asset_manager);
+    void process_model(SDL_GPUDevice *device, aiNode *node, const aiScene *scene);
 
-    Mesh process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene, AssetManager &asset_manager);
+    Mesh process_mesh(SDL_GPUDevice *device, aiMesh *mesh, const aiScene *scene);
+
+    void upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture texture);
 };
 
 

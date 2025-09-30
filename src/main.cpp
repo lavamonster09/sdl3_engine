@@ -26,8 +26,8 @@ int main() {
     g_engine.add_entity("map");
     g_engine.add_component("map", Transform3D{
                                {0.0f, 0.0f, -0.0f},
-                               {1.0f, 0.0f, 0.0f},
-                               glm::radians(0.0f),
+                               {0.0f, 0.0f, 1.0f},
+                               glm::radians(180.0f),
                                0.05f
                            });
     g_engine.add_component("map", Mesh3D{

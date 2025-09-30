@@ -5,7 +5,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <AssetManager.h>
 #include <queue>
 #include <unordered_map>
 #include <SDL3/SDL_gpu.h>
@@ -30,7 +29,6 @@ public:
     void add_light(glm::vec3 position, glm::vec3 color, bool billboard, float strength);
 
 private:
-    AssetManager asset_manager;
     glm::vec4 clear_color;
     SDL_GPUDevice *device = nullptr;
     SDL_GPUShader *vertex_shader = nullptr;

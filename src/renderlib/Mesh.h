@@ -13,6 +13,8 @@
 
 class Mesh {
 public:
+    std::vector<Vertex> vertices;
+    std::vector<Uint32> indices;
     Material material;
 
     Mesh(SDL_GPUDevice *device, std::vector<Vertex> vertices, std::vector<Uint32> indices, Material textures);
@@ -20,13 +22,12 @@ public:
     void draw(SDL_GPURenderPass *render_pass, SDL_GPUSampler *sampler, const Camera *camera,
               SDL_GPUCommandBuffer *command_buffer, const std::vector<PointLight *> &lights, glm::mat4 model_mat) const;
 
+    void upload_texture(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device, Texture &texture);
+
     void upload_mesh(SDL_GPUCopyPass *copy_pass, SDL_GPUDevice *device);
 
 private:
     MeshBuffer mesh_buffer;
-    SDL_GPUBufferRegion index_buffer_region{};
-    SDL_GPUBufferRegion vertex_buffer_region{};
-    int num_indices;
 
     void setup_mesh(SDL_GPUDevice *device);
 };

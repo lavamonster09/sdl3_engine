@@ -80,7 +80,7 @@ SDL_GPUShader *load_shader_from_file(SDL_GPUDevice *device, std::string path, Sh
     return shader;
 }
 
-Texture *create_texture_image(
+Texture create_texture_image(
     SDL_GPUDevice *device, const std::string &path) {
     std::string p = "../assets/" + path;
     SDL_Surface *image_data = LoadImage(p.c_str(), 4);
@@ -113,7 +113,7 @@ Texture *create_texture_image(
 
     SDL_GPUTexture *texture = SDL_CreateGPUTexture(device, &texture_create_info);
 
-    return new Texture{image_data, texture, texture_transfer_info};
+    return Texture{image_data, texture, transfer_buffer, texture_transfer_info};
 }
 
 

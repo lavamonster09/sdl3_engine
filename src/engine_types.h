@@ -52,6 +52,7 @@ struct ModelUniformBuffer {
 struct Texture {
     SDL_Surface *image_data;
     SDL_GPUTexture *texture;
+    SDL_GPUTransferBuffer *texture_transfer_buffer;
     SDL_GPUTextureTransferInfo texture_transfer_info;
 };
 
@@ -61,9 +62,9 @@ struct ModelCreateInfo {
 };
 
 struct Material {
-    Texture *texture_diff;
-    Texture *texture_norm;
-    Texture *texture_rough;
+    Texture texture_diff;
+    Texture texture_norm;
+    Texture texture_rough;
 };
 
 

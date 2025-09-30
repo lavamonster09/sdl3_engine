@@ -35,7 +35,7 @@ vec3 calculate_point_light(pointLight point_light) {
     vec3 specular = point_light.color.rgb * spec;
     float distance = length(point_light.position - fs_in.frag_pos);
 
-    return ((diffuse + specular) * (1 / (distance * distance)) * point_light.strength);
+    return ((vec3(0.1f, 0.1f, 0.1f) + diffuse + specular) * (1 / (distance * distance)) * point_light.strength);
 }
 
 vec3 calculate_directional_light(vec3 direction) {
@@ -46,12 +46,12 @@ vec3 calculate_directional_light(vec3 direction) {
     vec3 halfway_direction = normalize(light_direction + view_direction);
 
     float diff = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse = diff * vec3(0.5f);
+    vec3 diffuse = diff * vec3(1.0f, 1.0f, 1.0f);
 
     float spec = pow(max(dot(normal, halfway_direction), 0.0), texture(roughnessMap, fs_in.uv).x * 8);
     vec3 specular = vec3(0.1f, 0.1f, 0.1f) * spec;
 
-    return (diffuse + specular);
+    return ((vec3(0.1f, 0.1f, 0.1f) + diffuse + specular));
 }
 
 void main() {
@@ -62,12 +62,10 @@ void main() {
     for (int i = 0; i < 4; i++) {
         result += calculate_point_light(fs_in.point_lights[i]);
     }
-    result += calculate_directional_light(vec3(-0.4f, -0.6f, -0.3f));
+    result += calculate_directional_light(vec3(-0.2f, -1.0f, -0.0f));
     if (t.a != 0) {
-        float gamma = 2.2;
-        result = result + vec3(0.001f);
-        vec4 final = vec4(result * t.rgb, 1.0f);
-        FragColor = pow(final, vec4(1.0 / gamma));;
+        float gamma = 2.7;
+        FragColor = pow(vec4(result * t.rgb, 1.0f), vec4(1.0 / gamma));;
     }
     else {
         discard;
