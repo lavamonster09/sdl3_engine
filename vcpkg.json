@@ -5,6 +5,7 @@
     "assimp",
     "glm",
     {
+<<<<<<< HEAD
       "name": "imgui",
       "features": [
         "sdl3-binding",
@@ -12,6 +13,8 @@
       ]
     },
     {
+=======
+>>>>>>> parent of 802d791 (idk)
       "name": "sdl3",
       "features": [
         "vulkan"
@@ -26,6 +29,10 @@
     },
     "tinyobjloader",
     "vulkan",
+<<<<<<< HEAD
     "stb"
+=======
+    "imgui"
+>>>>>>> parent of 802d791 (idk)
   ]
 }

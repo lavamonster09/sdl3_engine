@@ -11,18 +11,28 @@ find_package(assimp REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
+<<<<<<< HEAD
 include_directories(src/renderlib)
 
+=======
+>>>>>>> parent of 802d791 (idk)
 add_executable(sdl3_engine src/main.cpp
         src/engine_types.h
         src/common.h
         src/common.cpp
+        src/camera.cpp
+        src/camera.h
         src/InputManager.cpp
         src/InputManager.h
         src/Engine.cpp
         src/Engine.h
+        src/Renderer.cpp
+        src/Renderer.h
+        src/Model.cpp
+        src/Model.h
         src/CameraController.cpp
         src/CameraController.h
+<<<<<<< HEAD
         src/ECS.h
         src/components.h
         src/Renderer3DSystem.cpp
@@ -37,7 +47,14 @@ add_executable(sdl3_engine src/main.cpp
         src/renderlib/Model.cpp
         src/renderlib/Renderer.cpp
         src/renderlib/Renderer.h
+=======
+        src/Mesh.cpp
+        src/Mesh.h
+>>>>>>> parent of 802d791 (idk)
 )
+
+get_target_property(ASSIMP_IMPORTED_LOCATION assimp::assimp IMPORTED_LOCATION)
+message(STATUS "Assimp linked from: ${ASSIMP_IMPORTED_LOCATION}")
 
 function(add_shaders TARGET_NAME)
     set(SHADER_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/shaders")
@@ -68,9 +85,17 @@ add_shaders(Shaders ${SHADER_SOURCES})
 add_dependencies(sdl3_engine Shaders)
 
 target_link_libraries(sdl3_engine PRIVATE SDL3::SDL3)
+<<<<<<< HEAD
 target_link_libraries(sdl3_engine PRIVATE tinyobjloader::tinyobjloader)
 target_link_libraries(sdl3_engine PRIVATE glm::glm)
 target_link_libraries(sdl3_engine PRIVATE assimp::assimp)
 target_link_libraries(sdl3_engine PRIVATE imgui::imgui)
 target_link_libraries(sdl3_engine PRIVATE $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>)
 target_include_directories(sdl3_engine PRIVATE ${Stb_INCLUDE_DIR})
+=======
+target_link_libraries(sdl3_engine PRIVATE $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>)
+target_link_libraries(sdl3_engine PRIVATE tinyobjloader::tinyobjloader)
+target_link_libraries(sdl3_engine PRIVATE glm::glm)
+target_link_libraries(sdl3_engine PRIVATE assimp::assimp)
+target_link_libraries(sdl3_engine PRIVATE imgui::imgui)
+>>>>>>> parent of 802d791 (idk)
